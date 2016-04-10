@@ -21,10 +21,19 @@
 
 ;;; Commentary:
 
-;; 
+;; edit-it provides an interactive UI for manipulating lists.
 
 ;;; Code:
 
+(defun edit-it ()
+  "Interactively edit the value of a symbol \(usually a list\)."
+  (interactive)
+  ;; TODO: show the symbol name in the buffer name
+  (let* ((buf (get-buffer-create "*edit-it*"))
+         (symbol-name 'auto-mode-alist))
+    (switch-to-buffer buf)
+    ;; TODO: is there a better way of getting a symbol value?
+    (cl-prettyprint (eval symbol-name t))))
 
 
 (provide 'edit-it)
