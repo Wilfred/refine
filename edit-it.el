@@ -32,9 +32,9 @@
   (let* ((buf (get-buffer-create "*edit-it*"))
          (symbol-name 'auto-mode-alist))
     (switch-to-buffer buf)
+    (erase-buffer)
     ;; TODO: is there a better way of getting a symbol value?
     (cl-prettyprint (eval symbol-name t))))
-
 
 (provide 'edit-it)
 ;;; edit-it.el ends here
