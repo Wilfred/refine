@@ -25,16 +25,24 @@
 
 ;;; Code:
 
+(defun edit-it-variables ()
+  "Return a list of all symbol names (strings) that are variables."
+  (let ((symbols))
+    (mapatoms (lambda (symbol)
+                (when (boundp symbol)
+                  (push symbol symbols))))
+    symbols))
+
 (defun edit-it ()
   "Interactively edit the value of a symbol \(usually a list\)."
   (interactive)
   ;; TODO: show the symbol name in the buffer name
   (let* ((buf (get-buffer-create "*edit-it*"))
-         (symbol-name 'auto-mode-alist))
+         (symbol-name (completing-read "Variable: " (edit-it-variables)))
+         (symbol-value (eval (read symbol-name) t)))
     (switch-to-buffer buf)
     (erase-buffer)
-    ;; TODO: is there a better way of getting a symbol value?
-    (cl-prettyprint (eval symbol-name t))))
+    (cl-prettyprint symbol-value)))
 
 (provide 'edit-it)
 ;;; edit-it.el ends here
