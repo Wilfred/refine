@@ -42,7 +42,13 @@
          (buf (get-buffer-create (format "*edit-it: %s*" symbol-name))))
     (switch-to-buffer buf)
     (erase-buffer)
-    (cl-prettyprint symbol-value)))
+    (cl-prettyprint symbol-value)
+    (edit-it-mode)))
+
+(define-derived-mode edit-it-mode fundamental-mode "Edit-It"
+  "A major mode for interactively editing elisp values.")
+
+(define-key edit-it-mode-map (kbd "q") #'kill-this-buffer)
 
 (provide 'edit-it)
 ;;; edit-it.el ends here
