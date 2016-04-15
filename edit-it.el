@@ -37,9 +37,9 @@
   "Interactively edit the value of a symbol \(usually a list\)."
   (interactive)
   ;; TODO: show the symbol name in the buffer name
-  (let* ((buf (get-buffer-create "*edit-it*"))
-         (symbol-name (completing-read "Variable: " (edit-it-variables)))
-         (symbol-value (eval (read symbol-name) t)))
+  (let* ((symbol-name (completing-read "Variable: " (edit-it-variables)))
+         (symbol-value (eval (read symbol-name) t))
+         (buf (get-buffer-create (format "*edit-it: %s*" symbol-name))))
     (switch-to-buffer buf)
     (erase-buffer)
     (cl-prettyprint symbol-value)))
