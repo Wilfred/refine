@@ -45,8 +45,15 @@
     (cl-prettyprint symbol-value)
     (edit-it-mode)))
 
+(defvar edit-it-mode-syntax-table
+  (let ((table (make-syntax-table)))
+    (modify-syntax-entry ?\" "\"" table)
+    table))
+
 (define-derived-mode edit-it-mode fundamental-mode "Edit-It"
-  "A major mode for interactively editing elisp values.")
+  "A major mode for interactively editing elisp values."
+  :syntax-table edit-it-mode-syntax-table
+  (font-lock-fontify-buffer))
 
 (define-key edit-it-mode-map (kbd "q") #'kill-this-buffer)
 
