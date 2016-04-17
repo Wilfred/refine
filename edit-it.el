@@ -42,11 +42,14 @@
     (s-trim (buffer-string))))
 
 (defun edit-it--update (buffer symbol)
-  "Update BUFFER with the VALUE of SYMBOL."
+  "Update BUFFER with the current value of SYMBOL."
   (let ((value (eval symbol t)))
     (with-current-buffer buffer
       (erase-buffer)
-      (insert (edit-it--pretty-print value)))))
+      (insert (format "%s is %s\n\n" symbol
+                      (if (consp value) "a list" "not a list")))
+      (insert (edit-it--pretty-print value))
+      (goto-char (point-min)))))
 
 
 (defvar-local edit-it--symbol nil
@@ -62,9 +65,8 @@
 (defun edit-it ()
   "Interactively edit the value of a symbol \(usually a list\)."
   (interactive)
-  (let* ((symbol-name (completing-read "Variable: " (edit-it--variables)))
-         (symbol (read symbol-name))
-         (buf (edit-it--buffer symbol-name)))
+  (let* ((symbol (read (completing-read "Variable: " (edit-it--variables))))
+         (buf (edit-it--buffer symbol)))
     (edit-it--update buf symbol)
     (switch-to-buffer buf)
     (edit-it-mode)))
