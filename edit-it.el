@@ -47,7 +47,7 @@
     (with-current-buffer buffer
       (erase-buffer)
       (insert (format "%s is %s\n\n" symbol
-                      (if (consp value) "a list" "not a list")))
+                      (edit-it--describe value)))
       (insert (edit-it--pretty-print value))
       (goto-char (point-min)))))
 
@@ -61,6 +61,17 @@
     (with-current-buffer buffer
       (setq edit-it--symbol symbol))
     buffer))
+
+(defun edit-it--describe (value)
+  "Return a human-readable description for VALUE."
+  (cond
+   ((stringp value) "a string")
+   ((consp value) (if (list-utils-cyclic-p value)
+                      "an improper list"
+                    "a list"))
+   ((vectorp value) "a vector")
+   ((null value) "nil")
+   (:else "an unsupported type")))
 
 (defun edit-it ()
   "Interactively edit the value of a symbol \(usually a list\)."
