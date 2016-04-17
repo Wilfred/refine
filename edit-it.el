@@ -44,7 +44,6 @@
 (defun edit-it ()
   "Interactively edit the value of a symbol \(usually a list\)."
   (interactive)
-  ;; TODO: show the symbol name in the buffer name
   (let* ((symbol-name (completing-read "Variable: " (edit-it--variables)))
          (symbol-value (eval (read symbol-name) t))
          (buf (get-buffer-create (format "*edit-it: %s*" symbol-name))))
