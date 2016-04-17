@@ -27,7 +27,7 @@
 
 (require 's)
 
-(defun edit-it-variables ()
+(defun edit-it--variables ()
   "Return a list of all symbol names (strings) that are variables."
   (let ((symbols))
     (mapatoms (lambda (symbol)
@@ -35,7 +35,7 @@
                   (push symbol symbols))))
     symbols))
 
-(defun edit-it-pretty-print (value)
+(defun edit-it--pretty-print (value)
   "Pretty print VALUE as a string."
   (with-temp-buffer
     (cl-prettyprint value)
@@ -45,12 +45,12 @@
   "Interactively edit the value of a symbol \(usually a list\)."
   (interactive)
   ;; TODO: show the symbol name in the buffer name
-  (let* ((symbol-name (completing-read "Variable: " (edit-it-variables)))
+  (let* ((symbol-name (completing-read "Variable: " (edit-it--variables)))
          (symbol-value (eval (read symbol-name) t))
          (buf (get-buffer-create (format "*edit-it: %s*" symbol-name))))
     (switch-to-buffer buf)
     (erase-buffer)
-    (insert (edit-it-pretty-print symbol-value))
+    (insert (edit-it--pretty-print symbol-value))
     (edit-it-mode)))
 
 (defvar edit-it-mode-syntax-table
