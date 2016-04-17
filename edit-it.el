@@ -25,6 +25,8 @@
 
 ;;; Code:
 
+(require 's)
+
 (defun edit-it-variables ()
   "Return a list of all symbol names (strings) that are variables."
   (let ((symbols))
@@ -32,6 +34,12 @@
                 (when (boundp symbol)
                   (push symbol symbols))))
     symbols))
+
+(defun edit-it-pretty-print (value)
+  "Pretty print VALUE as a string."
+  (with-temp-buffer
+    (cl-prettyprint value)
+    (s-trim (buffer-string))))
 
 (defun edit-it ()
   "Interactively edit the value of a symbol \(usually a list\)."
@@ -42,7 +50,7 @@
          (buf (get-buffer-create (format "*edit-it: %s*" symbol-name))))
     (switch-to-buffer buf)
     (erase-buffer)
-    (cl-prettyprint symbol-value)
+    (insert (edit-it-pretty-print symbol-value))
     (edit-it-mode)))
 
 (defvar edit-it-mode-syntax-table
