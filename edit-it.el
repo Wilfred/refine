@@ -51,14 +51,22 @@
       (insert (edit-it--pretty-print value))
       (goto-char (point-min)))))
 
+(defun edit-it-update ()
+  "Update the current edit-it buffer."
+  (interactive)
+  ;; TODO: assert we're in edit-it mode.
+  (edit-it--update (current-buffer) edit-it--symbol))
 
 (defvar-local edit-it--symbol nil
   "The symbol being inspected in the current buffer.")
 
 (defun edit-it--buffer (symbol)
   "Get or create an edit-it buffer for SYMBOL."
+  (assert (symbolp symbol))
   (let ((buffer (get-buffer-create (format "*edit-it: %s*" symbol))))
     (with-current-buffer buffer
+      ;; Need to set the major mode before we local variables.
+      (edit-it-mode)
       (setq edit-it--symbol symbol))
     buffer))
 
@@ -79,8 +87,7 @@
   (let* ((symbol (read (completing-read "Variable: " (edit-it--variables))))
          (buf (edit-it--buffer symbol)))
     (edit-it--update buf symbol)
-    (switch-to-buffer buf)
-    (edit-it-mode)))
+    (switch-to-buffer buf)))
 
 (defvar edit-it-mode-syntax-table
   (let ((table (make-syntax-table)))
@@ -93,6 +100,7 @@
   (font-lock-fontify-buffer))
 
 (define-key edit-it-mode-map (kbd "q") #'kill-this-buffer)
+(define-key edit-it-mode-map (kbd "g") #'edit-it-update)
 
 (provide 'edit-it)
 ;;; edit-it.el ends here
