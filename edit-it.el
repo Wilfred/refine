@@ -47,12 +47,22 @@
     (erase-buffer)
     (insert (edit-it--pretty-print value))))
 
+(defvar-local edit-it--symbol nil
+  "The symbol being inspected in the current buffer.")
+
+(defun edit-it--buffer (symbol)
+  "Get or create an edit-it buffer for SYMBOL."
+  (let ((buffer (get-buffer-create (format "*edit-it: %s*" symbol))))
+    (with-current-buffer buffer
+      (setq edit-it--symbol symbol))
+    buffer))
+
 (defun edit-it ()
   "Interactively edit the value of a symbol \(usually a list\)."
   (interactive)
   (let* ((symbol-name (completing-read "Variable: " (edit-it--variables)))
          (symbol-value (eval (read symbol-name) t))
-         (buf (get-buffer-create (format "*edit-it: %s*" symbol-name))))
+         (buf (edit-it--buffer symbol-name)))
     (edit-it--update buf symbol-name symbol-value)
     (switch-to-buffer buf)
     (edit-it-mode)))
