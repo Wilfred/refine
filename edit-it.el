@@ -48,7 +48,12 @@
       (erase-buffer)
       (insert (format "%s is %s\n\n" symbol
                       (edit-it--describe value)))
-      (insert (edit-it--pretty-print value))
+      (--map-indexed
+       (insert
+        (propertize it 'edit-it-index it-index)
+        "\n")
+       (s-lines (edit-it--pretty-print value)))
+      ;; TODO: preserve point position
       (goto-char (point-min)))))
 
 (defun edit-it-update ()
