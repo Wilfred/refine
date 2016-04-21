@@ -76,7 +76,8 @@
    ((stringp value) "a string")
    ((consp value) (if (list-utils-cyclic-p value)
                       "an improper list"
-                    "a list"))
+                    (format "a list containing %d values"
+                            (length value))))
    ((vectorp value) "a vector")
    ((null value) "nil")
    (:else "an unsupported type")))
