@@ -26,6 +26,9 @@
 ;;; Code:
 
 (require 's)
+(require 'dash)
+(require 'list-utils)
+(eval-when-compile (require 'cl))
 
 (defun mutant--variables ()
   "Return a list of all symbol names (strings) that are variables."
@@ -57,6 +60,9 @@
        (s-lines (mutant--pretty-print value)))
       ;; TODO: preserve point position
       (goto-char (point-min)))))
+
+(defvar-local mutant--symbol nil
+  "The symbol being inspected in the current buffer.")
 
 (defun mutant-update ()
   "Update the current mutant buffer."
@@ -146,9 +152,6 @@ If the list only has one element, assign nil to SYMBOL instead."
     (mutant--insert mutant--symbol (1+ list-index) value)
     (mutant-update)))
 
-(defvar-local mutant--symbol nil
-  "The symbol being inspected in the current buffer.")
-
 (defun mutant--buffer (symbol)
   "Get or create an mutant buffer for SYMBOL."
   (assert (symbolp symbol))
@@ -197,4 +200,4 @@ If the list only has one element, assign nil to SYMBOL instead."
 (define-key mutant-mode-map (kbd "a") #'mutant-insert-after)
 
 (provide 'mutant)
-;;; mutant.el ends here
+;;; mutant.el ends here1
