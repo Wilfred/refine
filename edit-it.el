@@ -70,6 +70,7 @@ This mutates the list.
 
 If the list only has one element, assign nil to SYMBOL instead."
   ;; TODO: factor out an eval wrapper function.
+  (assert (symbolp symbol))
   (let* ((list (eval symbol t))
          (length (safe-length list)))
     ;; `symbol' must be a list that's long enough.
