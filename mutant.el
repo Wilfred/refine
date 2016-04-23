@@ -1,4 +1,4 @@
-;;; edit-it.el --- interactive value editing         -*- lexical-binding: t; -*-
+;;; mutant.el --- interactive value editing         -*- lexical-binding: t; -*-
 
 ;; Copyright (C) 2016  
 
@@ -21,13 +21,13 @@
 
 ;;; Commentary:
 
-;; edit-it provides an interactive UI for manipulating lists.
+;; mutant provides an interactive UI for manipulating lists.
 
 ;;; Code:
 
 (require 's)
 
-(defun edit-it--variables ()
+(defun mutant--variables ()
   "Return a list of all symbol names (strings) that are variables."
   (let ((symbols))
     (mapatoms (lambda (symbol)
@@ -35,36 +35,36 @@
                   (push symbol symbols))))
     symbols))
 
-(defun edit-it--pretty-print (value)
+(defun mutant--pretty-print (value)
   "Pretty print VALUE as a string."
   (with-temp-buffer
     (cl-prettyprint value)
     (s-trim (buffer-string))))
 
-(defun edit-it--update (buffer symbol)
+(defun mutant--update (buffer symbol)
   "Update BUFFER with the current value of SYMBOL."
   (let ((value (eval symbol t)))
     (with-current-buffer buffer
       (erase-buffer)
       (insert (format "%s is %s\n\n" symbol
-                      (edit-it--describe value)))
+                      (mutant--describe value)))
       ;; TODO: Handle empty lists and non-lists, we shouldn't
       ;; propertize anything in those cases.
       (--map-indexed
        (insert
-        (propertize it 'edit-it-index it-index)
+        (propertize it 'mutant-index it-index)
         "\n")
-       (s-lines (edit-it--pretty-print value)))
+       (s-lines (mutant--pretty-print value)))
       ;; TODO: preserve point position
       (goto-char (point-min)))))
 
-(defun edit-it-update ()
-  "Update the current edit-it buffer."
+(defun mutant-update ()
+  "Update the current mutant buffer."
   (interactive)
-  ;; TODO: assert we're in edit-it mode.
-  (edit-it--update (current-buffer) edit-it--symbol))
+  ;; TODO: assert we're in mutant mode.
+  (mutant--update (current-buffer) mutant--symbol))
 
-(defun edit-it--insert (symbol index value)
+(defun mutant--insert (symbol index value)
   "Insert VALUE at INDEX in list variable SYMBOL.
 This mutates the list.
 
@@ -100,7 +100,7 @@ If SYMBOL is nil, assigns to SYMBOL instead."
         (setcar list value)
         (setcdr list (cons old-car old-cdr)))))))
 
-(defun edit-it--pop (symbol index)
+(defun mutant--pop (symbol index)
   "Remove the item at INDEX from list variable SYMBOL.
 This mutates the list.
 
@@ -125,41 +125,41 @@ If the list only has one element, assign nil to SYMBOL instead."
         (setcar list new-car)
         (setcdr list new-cdr))))))
 
-(defun edit-it-delete ()
+(defun mutant-delete ()
   "Remove the current list item at point."
   (interactive)
-  (-when-let (list-index (get-text-property (point) 'edit-it-index))
-    (edit-it--pop edit-it--symbol list-index)
-    (edit-it-update)))
+  (-when-let (list-index (get-text-property (point) 'mutant-index))
+    (mutant--pop mutant--symbol list-index)
+    (mutant-update)))
 
-(defun edit-it-insert-before (value)
+(defun mutant-insert-before (value)
   "Insert a new item before the list item at point."
   (interactive "XValue to insert before this: ")
-  (-when-let (list-index (get-text-property (point) 'edit-it-index))
-    (edit-it--insert edit-it--symbol list-index value)
-    (edit-it-update)))
+  (-when-let (list-index (get-text-property (point) 'mutant-index))
+    (mutant--insert mutant--symbol list-index value)
+    (mutant-update)))
 
-(defun edit-it-insert-after (value)
+(defun mutant-insert-after (value)
   "Insert a new item before the list item at point."
   (interactive "XValue to insert after this: ")
-  (-when-let (list-index (get-text-property (point) 'edit-it-index))
-    (edit-it--insert edit-it--symbol (1+ list-index) value)
-    (edit-it-update)))
+  (-when-let (list-index (get-text-property (point) 'mutant-index))
+    (mutant--insert mutant--symbol (1+ list-index) value)
+    (mutant-update)))
 
-(defvar-local edit-it--symbol nil
+(defvar-local mutant--symbol nil
   "The symbol being inspected in the current buffer.")
 
-(defun edit-it--buffer (symbol)
-  "Get or create an edit-it buffer for SYMBOL."
+(defun mutant--buffer (symbol)
+  "Get or create an mutant buffer for SYMBOL."
   (assert (symbolp symbol))
-  (let ((buffer (get-buffer-create (format "*edit-it: %s*" symbol))))
+  (let ((buffer (get-buffer-create (format "*mutant: %s*" symbol))))
     (with-current-buffer buffer
       ;; Need to set the major mode before we local variables.
-      (edit-it-mode)
-      (setq edit-it--symbol symbol))
+      (mutant-mode)
+      (setq mutant--symbol symbol))
     buffer))
 
-(defun edit-it--describe (value)
+(defun mutant--describe (value)
   "Return a human-readable description for VALUE."
   (cond
    ((stringp value) "a string")
@@ -171,29 +171,29 @@ If the list only has one element, assign nil to SYMBOL instead."
    ((null value) "nil")
    (:else "an unsupported type")))
 
-(defun edit-it ()
+(defun mutant ()
   "Interactively edit the value of a symbol \(usually a list\)."
   (interactive)
-  (let* ((symbol (read (completing-read "Variable: " (edit-it--variables))))
-         (buf (edit-it--buffer symbol)))
-    (edit-it--update buf symbol)
+  (let* ((symbol (read (completing-read "Variable: " (mutant--variables))))
+         (buf (mutant--buffer symbol)))
+    (mutant--update buf symbol)
     (switch-to-buffer buf)))
 
-(defvar edit-it-mode-syntax-table
+(defvar mutant-mode-syntax-table
   (let ((table (make-syntax-table)))
     (modify-syntax-entry ?\" "\"" table)
     table))
 
-(define-derived-mode edit-it-mode fundamental-mode "Edit-It"
+(define-derived-mode mutant-mode fundamental-mode "Mutant"
   "A major mode for interactively editing elisp values."
-  :syntax-table edit-it-mode-syntax-table
+  :syntax-table mutant-mode-syntax-table
   (font-lock-fontify-buffer))
 
-(define-key edit-it-mode-map (kbd "q") #'kill-this-buffer)
-(define-key edit-it-mode-map (kbd "g") #'edit-it-update)
-(define-key edit-it-mode-map (kbd "d") #'edit-it-delete)
-(define-key edit-it-mode-map (kbd "b") #'edit-it-insert-before)
-(define-key edit-it-mode-map (kbd "a") #'edit-it-insert-after)
+(define-key mutant-mode-map (kbd "q") #'kill-this-buffer)
+(define-key mutant-mode-map (kbd "g") #'mutant-update)
+(define-key mutant-mode-map (kbd "d") #'mutant-delete)
+(define-key mutant-mode-map (kbd "b") #'mutant-insert-before)
+(define-key mutant-mode-map (kbd "a") #'mutant-insert-after)
 
-(provide 'edit-it)
-;;; edit-it.el ends here
+(provide 'mutant)
+;;; mutant.el ends here
