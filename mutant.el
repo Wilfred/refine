@@ -171,6 +171,7 @@ If the list only has one element, assign nil to SYMBOL instead."
    ((null value) "nil")
    (:else "an unsupported type")))
 
+;;;###autoload
 (defun mutant ()
   "Interactively edit the value of a symbol \(usually a list\)."
   (interactive)
