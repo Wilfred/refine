@@ -64,6 +64,42 @@
   ;; TODO: assert we're in edit-it mode.
   (edit-it--update (current-buffer) edit-it--symbol))
 
+(defun edit-it--insert (symbol index value)
+  "Insert VALUE at INDEX in list variable SYMBOL.
+This mutates the list.
+
+If SYMBOL is nil, assigns to SYMBOL instead."
+  (interactive)
+  (assert (symbolp symbol))
+  (let* ((list (eval symbol t))
+         (length (safe-length list)))
+    ;; `symbol' must be a list that's long enough.
+    (assert (and (consp list) (>= length index)))
+
+    (cond
+     ;; If list is nil, we can't modify destructively.
+     ((= length 0) (set symbol (list value)))
+
+     ;; Append to the list.
+     ((= index length)
+      ;; Find the last cons cell.
+      (while (cdr list)
+        (setq list (cdr list)))
+      ;; Append the value requested.
+      (setcdr list (cons value nil)))
+
+     ;; Insert inplace.
+     (t
+      ;; Walk down the list until we're one element away from our
+      ;; target.
+      (while (>= index 1)
+        (setq list (cdr list))
+        (setq index (1- index)))
+      ;; Mutate this cons cell.
+      (-let [(old-car . old-cdr) list]
+        (setcar list value)
+        (setcdr list (cons old-car old-cdr)))))))
+
 (defun edit-it--pop (symbol index)
   "Remove the item at INDEX from list variable SYMBOL.
 This mutates the list.
@@ -94,6 +130,20 @@ If the list only has one element, assign nil to SYMBOL instead."
   (interactive)
   (-when-let (list-index (get-text-property (point) 'edit-it-index))
     (edit-it--pop edit-it--symbol list-index)
+    (edit-it-update)))
+
+(defun edit-it-insert-before (value)
+  "Insert a new item before the list item at point."
+  (interactive "XValue to insert before this: ")
+  (-when-let (list-index (get-text-property (point) 'edit-it-index))
+    (edit-it--insert edit-it--symbol list-index value)
+    (edit-it-update)))
+
+(defun edit-it-insert-after (value)
+  "Insert a new item before the list item at point."
+  (interactive "XValue to insert after this: ")
+  (-when-let (list-index (get-text-property (point) 'edit-it-index))
+    (edit-it--insert edit-it--symbol (1+ list-index) value)
     (edit-it-update)))
 
 (defvar-local edit-it--symbol nil
@@ -142,6 +192,8 @@ If the list only has one element, assign nil to SYMBOL instead."
 (define-key edit-it-mode-map (kbd "q") #'kill-this-buffer)
 (define-key edit-it-mode-map (kbd "g") #'edit-it-update)
 (define-key edit-it-mode-map (kbd "d") #'edit-it-delete)
+(define-key edit-it-mode-map (kbd "b") #'edit-it-insert-before)
+(define-key edit-it-mode-map (kbd "a") #'edit-it-insert-after)
 
 (provide 'edit-it)
 ;;; edit-it.el ends here
