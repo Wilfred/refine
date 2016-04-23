@@ -200,4 +200,4 @@ If the list only has one element, assign nil to SYMBOL instead."
 (define-key mutant-mode-map (kbd "a") #'mutant-insert-after)
 
 (provide 'mutant)
-;;; mutant.el ends here1
+;;; mutant.el ends here
