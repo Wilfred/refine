@@ -48,6 +48,8 @@
       (erase-buffer)
       (insert (format "%s is %s\n\n" symbol
                       (edit-it--describe value)))
+      ;; TODO: Handle empty lists and non-lists, we shouldn't
+      ;; propertize anything in those cases.
       (--map-indexed
        (insert
         (propertize it 'edit-it-index it-index)
@@ -61,6 +63,37 @@
   (interactive)
   ;; TODO: assert we're in edit-it mode.
   (edit-it--update (current-buffer) edit-it--symbol))
+
+(defun edit-it--pop (symbol index)
+  "Remove the item at INDEX from list variable SYMBOL.
+This mutates the list.
+
+If the list only has one element, assign nil to SYMBOL instead."
+  ;; TODO: factor out an eval wrapper function.
+  (let* ((list (eval symbol t))
+         (length (safe-length list)))
+    ;; `symbol' must be a list that's long enough.
+    (assert (and (consp list) (> length index)))
+
+    (cond
+     ((= length 0) (user-error "Can't pop from an empty list"))
+     ((= length 1) (set symbol nil))
+     (t
+      ;; Walk down the list until we're one element away from our
+      ;; target.
+      (while (>= index 1)
+        (setq list (cdr list))
+        (setq index (1- index)))
+      (-let [(_ new-car . new-cdr) list]
+        (setcar list new-car)
+        (setcdr list new-cdr))))))
+
+(defun edit-it-delete ()
+  "Remove the current list item at point."
+  (interactive)
+  (-when-let (list-index (get-text-property (point) 'edit-it-index))
+    (edit-it--pop edit-it--symbol list-index)
+    (edit-it-update)))
 
 (defvar-local edit-it--symbol nil
   "The symbol being inspected in the current buffer.")
@@ -107,6 +140,7 @@
 
 (define-key edit-it-mode-map (kbd "q") #'kill-this-buffer)
 (define-key edit-it-mode-map (kbd "g") #'edit-it-update)
+(define-key edit-it-mode-map (kbd "d") #'edit-it-delete)
 
 (provide 'edit-it)
 ;;; edit-it.el ends here
