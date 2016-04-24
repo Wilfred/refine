@@ -28,7 +28,9 @@
 (require 's)
 (require 'dash)
 (require 'list-utils)
-(eval-when-compile (require 'cl))
+(eval-when-compile
+  (require 'cl)
+  (require 'magit-popup))
 
 (defun mutant--variables ()
   "Return a list of all symbol names (strings) that are variables."
@@ -195,8 +197,13 @@ If the list only has one element, assign nil to SYMBOL instead."
   (font-lock-fontify-buffer)
   (setq buffer-read-only t))
 
+(magit-define-popup mutant-popup
+  "Popup console for changing items in a list."
+  :actions '((?g "Reload" mutant-update)
+             (?d "Delete" mutant-delete)))
 
 (define-key mutant-mode-map (kbd "q") #'kill-this-buffer)
+(define-key mutant-mode-map (kbd "?") #'mutant-popup)
 (define-key mutant-mode-map (kbd "g") #'mutant-update)
 (define-key mutant-mode-map (kbd "d") #'mutant-delete)
 (define-key mutant-mode-map (kbd "b") #'mutant-insert-before)

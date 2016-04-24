@@ -5,3 +5,4 @@
 (depends-on "s")
 (depends-on "dash")
 (depends-on "list-utils")
+(depends-on "magit-popup")
