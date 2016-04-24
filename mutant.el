@@ -48,18 +48,19 @@
   "Update BUFFER with the current value of SYMBOL."
   (let ((value (eval symbol t)))
     (with-current-buffer buffer
-      (erase-buffer)
-      (insert (format "%s is %s\n\n" symbol
-                      (mutant--describe value)))
-      ;; TODO: Handle empty lists and non-lists, we shouldn't
-      ;; propertize anything in those cases.
-      (--map-indexed
-       (insert
-        (propertize it 'mutant-index it-index)
-        "\n")
-       (s-lines (mutant--pretty-print value)))
-      ;; TODO: preserve point position
-      (goto-char (point-min)))))
+      (let (buffer-read-only)
+        (erase-buffer)
+        (insert (format "%s is %s\n\n" symbol
+                        (mutant--describe value)))
+        ;; TODO: Handle empty lists and non-lists, we shouldn't
+        ;; propertize anything in those cases.
+        (--map-indexed
+         (insert
+          (propertize it 'mutant-index it-index)
+          "\n")
+         (s-lines (mutant--pretty-print value)))
+        ;; TODO: preserve point position
+        (goto-char (point-min))))))
 
 (defvar-local mutant--symbol nil
   "The symbol being inspected in the current buffer.")
@@ -191,7 +192,9 @@ If the list only has one element, assign nil to SYMBOL instead."
 (define-derived-mode mutant-mode fundamental-mode "Mutant"
   "A major mode for interactively editing elisp values."
   :syntax-table mutant-mode-syntax-table
-  (font-lock-fontify-buffer))
+  (font-lock-fontify-buffer)
+  (setq buffer-read-only t))
+
 
 (define-key mutant-mode-map (kbd "q") #'kill-this-buffer)
 (define-key mutant-mode-map (kbd "g") #'mutant-update)
