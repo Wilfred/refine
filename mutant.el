@@ -58,7 +58,7 @@
            (pos (point))
            buffer-read-only)
       (erase-buffer)
-      (insert (format "%s is %s\n\n" symbol
+      (insert (format "%s is %s:\n\n" symbol
                       (mutant--describe value)))
       ;; TODO: Handle empty lists and non-lists, we shouldn't
       ;; propertize anything in those cases.
@@ -181,10 +181,13 @@ If the list only has one element, assign nil to SYMBOL instead."
   "Return a human-readable description for VALUE."
   (cond
    ((stringp value) "a string")
-   ((consp value) (if (list-utils-cyclic-p value)
-                      "an improper list"
-                    (format "a list containing %d values"
-                            (length value))))
+   ((and (consp value) (list-utils-cyclic-p value))
+    "an improper list")
+   ((consp value)
+    (let* ((length (length value))
+           (units (if (= length 1) "value" "values")))
+      (format "a list containing %d %s"
+              length units)))
    ((vectorp value) "a vector")
    ((null value) "nil")
    (:else "an unsupported type")))
