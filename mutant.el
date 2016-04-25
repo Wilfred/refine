@@ -46,23 +46,28 @@
     (cl-prettyprint value)
     (s-trim (buffer-string))))
 
+(defun mutant--eval (symbol)
+  "Return the value of SYMBOL."
+  ;; TODO: handle buffer-local variables
+  (eval symbol t))
+
 (defun mutant--update (buffer symbol)
   "Update BUFFER with the current value of SYMBOL."
-  (let ((value (eval symbol t)))
-    (with-current-buffer buffer
-      (let* ((pos (point))
-             buffer-read-only)
-        (erase-buffer)
-        (insert (format "%s is %s\n\n" symbol
-                        (mutant--describe value)))
-        ;; TODO: Handle empty lists and non-lists, we shouldn't
-        ;; propertize anything in those cases.
-        (--map-indexed
-         (insert
-          (propertize it 'mutant-index it-index)
-          "\n")
-         (s-lines (mutant--pretty-print value)))
-        (goto-char pos)))))
+  (with-current-buffer buffer
+    (let* ((value (mutant--eval symbol))
+           (pos (point))
+           buffer-read-only)
+      (erase-buffer)
+      (insert (format "%s is %s\n\n" symbol
+                      (mutant--describe value)))
+      ;; TODO: Handle empty lists and non-lists, we shouldn't
+      ;; propertize anything in those cases.
+      (--map-indexed
+       (insert
+        (propertize it 'mutant-index it-index)
+        "\n")
+       (s-lines (mutant--pretty-print value)))
+      (goto-char pos))))
 
 (defvar-local mutant--symbol nil
   "The symbol being inspected in the current buffer.")
@@ -81,7 +86,7 @@ This mutates the list.
 If SYMBOL is nil, assigns to SYMBOL instead."
   (interactive)
   (assert (symbolp symbol))
-  (let* ((list (eval symbol t))
+  (let* ((list (mutant--eval symbol))
          (length (safe-length list)))
     ;; `symbol' must be a list that's long enough.
     (assert (and (consp list) (>= length index)))
@@ -115,9 +120,8 @@ If SYMBOL is nil, assigns to SYMBOL instead."
 This mutates the list.
 
 If the list only has one element, assign nil to SYMBOL instead."
-  ;; TODO: factor out an eval wrapper function.
   (assert (symbolp symbol))
-  (let* ((list (eval symbol t))
+  (let* ((list (mutant--eval symbol))
          (length (safe-length list)))
     ;; `symbol' must be a list that's long enough.
     (assert (and (consp list) (> length index)))
