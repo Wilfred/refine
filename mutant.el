@@ -146,6 +146,13 @@ If the list only has one element, assign nil to SYMBOL instead."
   "Insert a new item before the list item at point."
   (interactive "XValue to insert before this: ")
   (-when-let (list-index (get-text-property (point) 'mutant-index))
+    (mutant--insert mutant--symbol (1- list-index) value)
+    (mutant-update)))
+
+(defun mutant-insert (value)
+  "Insert a new item at the list position at point."
+  (interactive "XValue to insert before this: ")
+  (-when-let (list-index (get-text-property (point) 'mutant-index))
     (mutant--insert mutant--symbol list-index value)
     (mutant-update)))
 
@@ -209,6 +216,7 @@ If the list only has one element, assign nil to SYMBOL instead."
 (define-key mutant-mode-map (kbd "d") #'mutant-delete)
 (define-key mutant-mode-map (kbd "b") #'mutant-insert-before)
 (define-key mutant-mode-map (kbd "a") #'mutant-insert-after)
+(define-key mutant-mode-map (kbd "i") #'mutant-insert)
 
 (provide 'mutant)
 ;;; mutant.el ends here
