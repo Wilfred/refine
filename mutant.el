@@ -50,7 +50,8 @@
   "Update BUFFER with the current value of SYMBOL."
   (let ((value (eval symbol t)))
     (with-current-buffer buffer
-      (let (buffer-read-only)
+      (let* ((pos (point))
+             buffer-read-only)
         (erase-buffer)
         (insert (format "%s is %s\n\n" symbol
                         (mutant--describe value)))
@@ -61,8 +62,7 @@
           (propertize it 'mutant-index it-index)
           "\n")
          (s-lines (mutant--pretty-print value)))
-        ;; TODO: preserve point position
-        (goto-char (point-min))))))
+        (goto-char pos)))))
 
 (defvar-local mutant--symbol nil
   "The symbol being inspected in the current buffer.")
