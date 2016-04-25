@@ -70,7 +70,8 @@
 (defun mutant-update ()
   "Update the current mutant buffer."
   (interactive)
-  ;; TODO: assert we're in mutant mode.
+  (unless (eq major-mode #'mutant-mode)
+    (user-error "mutant-update must be run in a mutant buffer"))
   (mutant--update (current-buffer) mutant--symbol))
 
 (defun mutant--insert (symbol index value)
