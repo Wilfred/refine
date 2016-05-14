@@ -43,12 +43,16 @@
                   (push symbol symbols))))
     symbols))
 
-;; TODO: we want to see fontified text, not #("..." 0 1 (...))
 (defun mutant--pretty-format (value)
   "Pretty print VALUE as a string."
-  (with-temp-buffer
-    (cl-prettyprint value)
-    (s-trim (buffer-string))))
+  (if (stringp value)
+      ;; Don't use cl-prettyprint for strings, as we want to see
+      ;; fontified text, not escaped literals like
+      ;; #("f" 0 1 (face font-lock-keyword-face))
+      (format "\"%s\"" value) ;; todo: escape " inside the string
+    (with-temp-buffer
+      (cl-prettyprint value)
+      (s-trim (buffer-string)))))
 
 (defun mutant--eval (symbol)
   "Return the value of SYMBOL."
