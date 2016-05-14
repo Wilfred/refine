@@ -62,6 +62,23 @@
   "Face for metadata in ag results buffers."
   :group 'mutant)
 
+(defun mutant--format-value (value)
+  "Given a list or vector VALUE, return a pretty propertized
+string listing the elements."
+  (s-join
+   "\n"
+   (--map-indexed
+    (let* ((index (propertize
+                   ;; TODO: is there a better int to string function?
+                   (format "%d" it-index)
+                   'face 'mutant-dim-face))
+           (raw-line (format
+                      "%s %s"
+                      index
+                      (mutant--pretty-print it))))
+      (propertize raw-line 'mutant-index it-index))
+    value)))
+
 (defun mutant--update (buffer symbol)
   "Update BUFFER with the current value of SYMBOL."
   (with-current-buffer buffer
@@ -72,16 +89,7 @@
       (insert (format "%s is %s:\n\n" symbol
                       (mutant--describe value)))
       ;; TODO: Handle non-lists
-      (--each-indexed value
-        (let* ((index (propertize
-                       (format "%d" it-index)
-                       'face 'mutant-dim-face))
-               (raw-line (format
-                          "%s %s\n"
-                          index
-                          (mutant--pretty-print it)))
-               (line (propertize raw-line 'mutant-index it-index)))
-          (insert line)))
+      (insert (mutant--format-value value))
       (goto-char pos))))
 
 (defvar-local mutant--symbol nil
