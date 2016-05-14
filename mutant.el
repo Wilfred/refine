@@ -43,9 +43,8 @@
                   (push symbol symbols))))
     symbols))
 
-;; TODO: this isn't a print, it has no side effects
 ;; TODO: we want to see fontified text, not #("..." 0 1 (...))
-(defun mutant--pretty-print (value)
+(defun mutant--pretty-format (value)
   "Pretty print VALUE as a string."
   (with-temp-buffer
     (cl-prettyprint value)
@@ -83,7 +82,7 @@ string listing the elements."
            (raw-line (format
                       "%s %s"
                       index
-                      (mutant--pretty-print it))))
+                      (mutant--pretty-format it))))
       (propertize raw-line 'mutant-index it-index))
     value)))
 
