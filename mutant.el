@@ -170,7 +170,7 @@ If the list only has one element, assign nil to SYMBOL instead."
 
 (defun mutant-insert (value)
   "Insert a new item at the list position at point."
-  (interactive "XValue to insert before this: ")
+  (interactive "XValue to insert: ")
   (-when-let (list-index (get-text-property (point) 'mutant-index))
     (mutant--insert mutant--symbol list-index value)
     (mutant-update)))
