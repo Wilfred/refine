@@ -58,7 +58,7 @@
   '((((class color) (background light))
      :foreground "grey50")
     (((class color) (background dark))
-     :foreground "grey70"))
+     :foreground "grey50"))
   "Face for metadata in ag results buffers."
   :group 'mutant)
 
