@@ -156,7 +156,7 @@ If the list only has one element, assign nil to SYMBOL instead."
   (let* ((list (mutant--eval symbol))
          (length (safe-length list)))
     ;; `symbol' must be a list that's long enough.
-    (assert (and (consp list) (> length index)))
+    (assert (and (consp list) (< index length)))
 
     (cond
      ((= length 0) (user-error "Can't pop from an empty list"))
