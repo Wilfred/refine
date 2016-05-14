@@ -62,9 +62,15 @@
   "Face for metadata in ag results buffers."
   :group 'mutant)
 
+(defun mutant--vector->list (vector)
+  "Shallow conversion from a vector to a list."
+  (mapcar #'identity vector))
+
 (defun mutant--format-value (value)
   "Given a list or vector VALUE, return a pretty propertized
 string listing the elements."
+  (when (vectorp value)
+    (setq value (mutant--vector->list value)))
   (s-join
    "\n"
    (--map-indexed
@@ -206,12 +212,12 @@ If the list only has one element, assign nil to SYMBOL instead."
    ((stringp value) "a string")
    ((and (consp value) (list-utils-cyclic-p value))
     "an improper list")
-   ((consp value)
-    (let* ((length (length value))
+   ((sequencep value)
+    (let* ((type (if (vectorp value) "vector" "list"))
+           (length (length value))
            (units (if (= length 1) "value" "values")))
-      (format "a list containing %d %s"
-              length units)))
-   ((vectorp value) "a vector")
+      (format "a %s containing %d %s"
+              type length units)))
    ((null value) "nil")
    (:else "an unsupported type")))
 
