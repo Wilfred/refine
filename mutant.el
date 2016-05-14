@@ -54,6 +54,14 @@
   ;; TODO: handle buffer-local variables
   (eval symbol t))
 
+(defface mutant-dim-face
+  '((((class color) (background light))
+     :foreground "grey50")
+    (((class color) (background dark))
+     :foreground "grey70"))
+  "Face for metadata in ag results buffers."
+  :group 'mutant)
+
 (defun mutant--update (buffer symbol)
   "Update BUFFER with the current value of SYMBOL."
   (with-current-buffer buffer
@@ -63,13 +71,18 @@
       (erase-buffer)
       (insert (format "%s is %s:\n\n" symbol
                       (mutant--describe value)))
-      ;; TODO: Handle empty lists and non-lists, we shouldn't
-      ;; propertize anything in those cases.
-      (--map-indexed
-       (insert
-        (propertize it 'mutant-index it-index)
-        "\n")
-       (s-lines (mutant--pretty-print value)))
+      ;; TODO: Handle non-lists
+      (--each-indexed value
+        ;; TODO: why doesn't this set the face?
+        (let* ((index (propertize
+                       (format "%d" it-index)
+                       'face 'mutant-dim-face))
+               (raw-line (format
+                          "%s %s\n"
+                          index
+                          (mutant--pretty-print it)))
+               (line (propertize raw-line 'mutant-index it-index)))
+          (insert line)))
       (goto-char pos))))
 
 (defvar-local mutant--symbol nil
