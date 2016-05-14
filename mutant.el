@@ -96,7 +96,6 @@ string listing the elements."
       (erase-buffer)
       (insert (format "%s is %s:\n\n" symbol
                       (mutant--describe value)))
-      ;; TODO: Handle non-lists
       (insert (mutant--format-value value))
       (goto-char pos))))
 
@@ -147,7 +146,19 @@ If SYMBOL is nil, assigns to SYMBOL instead."
         (setcar list value)
         (setcdr list (cons old-car old-cdr)))))))
 
-(defun mutant--pop (symbol index)
+(defun mutant--vector-pop (symbol index)
+  "Remove the item at INDEX from vector variable SYMBOL."
+  ;; TODO: this isn't in-place. Can we make it in-place?
+  (let* ((vector (mutant--eval symbol))
+         (length (length vector)))
+    (assert (and (vectorp vector) (< index length)))
+
+    (let* ((all-items (mutant--vector->list vector))
+           (items (--reject (= it-index index) all-items)))
+      (set symbol (apply #'vector items)))))
+
+
+(defun mutant--list-pop (symbol index)
   "Remove the item at INDEX from list variable SYMBOL.
 This mutates the list.
 
@@ -171,6 +182,13 @@ If the list only has one element, assign nil to SYMBOL instead."
         (setcar list new-car)
         (setcdr list new-cdr))))))
 
+(defun mutant--pop (symbol index)
+  "Remote the item at INDEX in vectory/list variable SYMBOL.
+Mutates the value where possible."
+  (if (vectorp (mutant--eval symbol))
+      (mutant--vector-pop symbol index)
+    (mutant--list-pop symbol index)))
+
 (defun mutant-delete ()
   "Remove the current list item at point."
   (interactive)
@@ -178,6 +196,7 @@ If the list only has one element, assign nil to SYMBOL instead."
     (mutant--pop mutant--symbol list-index)
     (mutant-update)))
 
+;; TODO: inserts should support vectors too.
 (defun mutant-insert-before (value)
   "Insert a new item before the list item at point."
   (interactive "XValue to insert before this: ")
@@ -209,6 +228,7 @@ If the list only has one element, assign nil to SYMBOL instead."
       (setq mutant--symbol symbol))
     buffer))
 
+;; TODO: support hash maps
 (defun mutant--describe (value)
   "Return a human-readable description for VALUE."
   (cond
