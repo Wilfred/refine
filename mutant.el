@@ -73,7 +73,6 @@
                       (mutant--describe value)))
       ;; TODO: Handle non-lists
       (--each-indexed value
-        ;; TODO: why doesn't this set the face?
         (let* ((index (propertize
                        (format "%d" it-index)
                        'face 'mutant-dim-face))
@@ -225,7 +224,6 @@ If the list only has one element, assign nil to SYMBOL instead."
 (define-derived-mode mutant-mode fundamental-mode "Mutant"
   "A major mode for interactively editing elisp values."
   :syntax-table mutant-mode-syntax-table
-  (font-lock-fontify-buffer)
   (setq buffer-read-only t))
 
 (magit-define-popup mutant-popup
