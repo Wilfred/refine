@@ -76,19 +76,24 @@
 string listing the elements."
   (when (vectorp value)
     (setq value (mutant--vector->list value)))
-  (s-join
-   "\n"
-   (--map-indexed
-    (let* ((index (propertize
-                   ;; TODO: is there a better int to string function?
-                   (format "%d" it-index)
-                   'face 'mutant-dim-face))
-           (raw-line (format
-                      "%s %s"
-                      index
-                      (mutant--pretty-format it))))
-      (propertize raw-line 'mutant-index it-index))
-    value)))
+
+  (let* ((length (length value))
+         (index-digits-required (ceiling (log length 10)))
+         ;; If there are 10 or more items, make sure we print the
+         ;; index with a width of 2, and so on.
+         (index-format-string (format "%%%dd" index-digits-required)))
+    (s-join
+     "\n"
+     (--map-indexed
+      (let* ((index (propertize
+                     (format index-format-string it-index)
+                     'face 'mutant-dim-face))
+             (raw-line (format
+                        "%s %s"
+                        index
+                        (mutant--pretty-format it))))
+        (propertize raw-line 'mutant-index it-index))
+      value))))
 
 (defun mutant--update (buffer symbol)
   "Update BUFFER with the current value of SYMBOL."
