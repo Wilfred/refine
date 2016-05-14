@@ -43,6 +43,8 @@
                   (push symbol symbols))))
     symbols))
 
+;; TODO: this isn't a print, it has no side effects
+;; TODO: we want to see fontified text, not #("..." 0 1 (...))
 (defun mutant--pretty-print (value)
   "Pretty print VALUE as a string."
   (with-temp-buffer
@@ -127,6 +129,7 @@ If SYMBOL is nil, assigns to SYMBOL instead."
      ;; Append to the list.
      ((= index length)
       ;; Find the last cons cell.
+      ;; TODO: use `nthcdr'?
       (while (cdr list)
         (setq list (cdr list)))
       ;; Append the value requested.
