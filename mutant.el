@@ -1,5 +1,8 @@
 ;;; mutant.el --- interactive value editing         -*- lexical-binding: t; -*-
 
+;; TODO: global variables
+;; TODO: hook into customize somehow
+
 ;; Copyright (C) 2016  
 
 ;; Author: Wilfred Hughes <me@wilfred.me.uk>
