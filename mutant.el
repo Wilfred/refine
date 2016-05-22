@@ -271,6 +271,7 @@ Mutates the value where possible."
   :actions '((?g "Reload" mutant-update)
              (?d "Delete" mutant-delete)))
 
+;; TODO: n and p navigation
 (define-key mutant-mode-map (kbd "q") #'kill-this-buffer)
 (define-key mutant-mode-map (kbd "?") #'mutant-popup)
 (define-key mutant-mode-map (kbd "g") #'mutant-update)
