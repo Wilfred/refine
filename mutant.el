@@ -45,14 +45,18 @@
 
 (defun mutant--pretty-format (value)
   "Pretty print VALUE as a string."
-  (if (stringp value)
-      ;; Don't use cl-prettyprint for strings, as we want to see
-      ;; fontified text, not escaped literals like
-      ;; #("f" 0 1 (face font-lock-keyword-face))
-      (format "\"%s\"" value) ;; todo: escape " inside the string
-    (with-temp-buffer
-      (cl-prettyprint value)
-      (s-trim (buffer-string)))))
+  (cond ((stringp value)
+         ;; Don't use cl-prettyprint for strings, as we want to see
+         ;; fontified text, not escaped literals like
+         ;; #("f" 0 1 (face font-lock-keyword-face))
+         (format "\"%s\"" value)) ;; todo: escape " inside the string
+        ((symbolp value)
+         ;; Ensure we display symbols with a quote, to avoid confusion.
+         (format "'%s" (symbol-name value)))
+        (t
+         (with-temp-buffer
+           (cl-prettyprint value)
+           (s-trim (buffer-string))))))
 
 (defun mutant--eval (symbol)
   "Return the value of SYMBOL."
