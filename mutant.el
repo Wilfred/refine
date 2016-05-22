@@ -83,6 +83,7 @@ string listing the elements."
   (when (vectorp value)
     (setq value (mutant--vector->list value)))
 
+  ;; TODO: Handle pairs.
   (let* ((length (length value))
          (index-digits-required (ceiling (log length 10)))
          ;; If there are 10 or more items, make sure we print the
@@ -235,6 +236,8 @@ Mutates the value where possible."
   "Return a human-readable description for VALUE."
   (cond
    ((stringp value) "a string")
+   ((and (consp value) (not (consp (cdr value))))
+    "a pair")
    ((and (consp value) (list-utils-cyclic-p value))
     "an improper list")
    ((sequencep value)
