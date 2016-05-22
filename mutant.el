@@ -36,7 +36,7 @@
   (require 'magit-popup))
 
 (defun mutant--variables ()
-  "Return a list of all symbol names (strings) that are variables."
+  "Return a list of all symbols that are variables."
   (let ((symbols))
     (mapatoms (lambda (symbol)
                 (when (boundp symbol)
@@ -222,7 +222,7 @@ Mutates the value where possible."
     (mutant-update)))
 
 (defun mutant--buffer (symbol)
-  "Get or create an mutant buffer for SYMBOL."
+  "Get or create a mutant buffer for SYMBOL."
   (assert (symbolp symbol))
   (let ((buffer (get-buffer-create (format "*mutant: %s*" symbol))))
     (with-current-buffer buffer
