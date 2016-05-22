@@ -136,9 +136,7 @@ If SYMBOL is nil, assigns to SYMBOL instead."
      ;; Append to the list.
      ((= index length)
       ;; Find the last cons cell.
-      ;; TODO: use `nthcdr'?
-      (while (cdr list)
-        (setq list (cdr list)))
+      (setq list (last list))
       ;; Append the value requested.
       (setcdr list (cons value nil)))
 
@@ -146,9 +144,7 @@ If SYMBOL is nil, assigns to SYMBOL instead."
      (t
       ;; Walk down the list until we're one element away from our
       ;; target.
-      (while (>= index 1)
-        (setq list (cdr list))
-        (setq index (1- index)))
+      (setq list (nthcdr index list))
       ;; Mutate this cons cell.
       (-let [(old-car . old-cdr) list]
         (setcar list value)
@@ -183,9 +179,8 @@ If the list only has one element, assign nil to SYMBOL instead."
      (t
       ;; Walk down the list until we're one element away from our
       ;; target.
-      (while (>= index 1)
-        (setq list (cdr list))
-        (setq index (1- index)))
+      (setq list (nthcdr index list))
+      ;; Mutate this cons cell.
       (-let [(_ new-car . new-cdr) list]
         (setcar list new-car)
         (setcdr list new-cdr))))))
