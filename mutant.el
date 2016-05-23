@@ -158,8 +158,10 @@ If SYMBOL is nil, assigns to SYMBOL instead."
         (setcdr list (cons old-car old-cdr)))))))
 
 (defun mutant--vector-pop (symbol index)
-  "Remove the item at INDEX from vector variable SYMBOL."
-  ;; TODO: this isn't in-place. Can we make it in-place?
+  "Remove the item at INDEX from vector variable SYMBOL.
+
+This creates a new vector and assigns it to SYMBOL. Vectors have
+fixed length, see *info* (elisp) Arrays."
   (let* ((vector (mutant--eval symbol))
          (length (length vector)))
     (assert (and (vectorp vector) (< index length)))
