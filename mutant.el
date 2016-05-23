@@ -201,10 +201,13 @@ Mutates the value where possible."
       (mutant--vector-pop symbol index)
     (mutant--list-pop symbol index)))
 
+(defun mutant--index-at-point ()
+  (get-text-property (point) 'mutant-index))
+
 (defun mutant-delete ()
   "Remove the current list item at point."
   (interactive)
-  (-when-let (list-index (get-text-property (point) 'mutant-index))
+  (-when-let (list-index (mutant--index-at-point))
     (mutant--pop mutant--symbol list-index)
     (mutant-update)))
 
@@ -212,14 +215,14 @@ Mutates the value where possible."
 (defun mutant-insert-before (value)
   "Insert a new item before the list item at point."
   (interactive "XValue to insert before this: ")
-  (-when-let (list-index (get-text-property (point) 'mutant-index))
+  (-when-let (list-index (mutant--index-at-point))
     (mutant--insert mutant--symbol list-index value)
     (mutant-update)))
 
 (defun mutant-insert-after (value)
   "Insert a new item before the list item at point."
   (interactive "XValue to insert after this: ")
-  (-when-let (list-index (get-text-property (point) 'mutant-index))
+  (-when-let (list-index (mutant--index-at-point))
     (mutant--insert mutant--symbol (1+ list-index) value)
     (mutant-update)))
 
