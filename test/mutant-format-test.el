@@ -4,6 +4,10 @@
 (ert-deftest mutant-format-symbol ()
   (should (equal (mutant--pretty-format 'x) "'x")))
 
+(ert-deftest mutant-format-builtin-symbol ()
+  (should (equal (mutant--pretty-format nil) "nil"))
+  (should (equal (mutant--pretty-format t) "t")))
+
 (ert-deftest mutant-format-string ()
   (should (equal (mutant--pretty-format "abc\"def") "\"abc\\\"def\"")))
 

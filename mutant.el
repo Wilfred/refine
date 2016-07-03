@@ -53,8 +53,11 @@
            ;; fontified text, not escaped literals like
            ;; #("f" 0 1 (face font-lock-keyword-face))
            (format "\"%s\"" (s-replace "\"" "\\\"" value)))
-          ;; string Display symbols and lists with a quote, so we show
-          ;; usable syntax.
+          ;; Print nil and t as-is.'
+          ((or (eq t value) (eq nil value))
+           (format "%s" value))
+          ;; Display other symbols, and lists, with a quote, so we
+          ;; show usable syntax.
           ((or (symbolp value) (consp value))
            (format "'%s" cl-formatted))
           (t
