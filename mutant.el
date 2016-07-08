@@ -112,7 +112,8 @@ string listing the elements."
            (pos (point))
            buffer-read-only)
       (erase-buffer)
-      (insert (format "%s is %s:\n\n" symbol
+      (insert (format "%s is %s:\n\n"
+                      (propertize (format "%s" symbol) 'face 'font-lock-variable-name-face)
                       (mutant--describe value)))
       (insert (mutant--format-value value))
       (goto-char pos))))
