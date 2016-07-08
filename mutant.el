@@ -68,12 +68,13 @@
   ;; TODO: handle buffer-local variables
   (eval symbol t))
 
+;; TODO: name for index, i.e. purpose, not colour.
 (defface mutant-dim-face
   '((((class color) (background light))
      :foreground "grey50")
     (((class color) (background dark))
      :foreground "grey50"))
-  "Face for metadata in ag results buffers."
+  "Face for metadata in mutant results buffers."
   :group 'mutant)
 
 (defun mutant--vector->list (vector)
