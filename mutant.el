@@ -315,7 +315,7 @@ With a numeric prefix, move that many items."
         (type-description
          (cond
           ((stringp value) "a string")
-          ((and (consp value) (not (consp (cdr value))))
+          ((and (consp value) (not (consp (cdr value))) (not (null (cdr value))))
            "a pair")
           ((and (consp value) (list-utils-cyclic-p value))
            "an improper list")

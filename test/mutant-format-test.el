@@ -17,3 +17,8 @@
 (ert-deftest mutant-describe-dotted-list ()
   (should (equal (mutant--describe 'x (cons 1 2))
                  "x is a global variable. Its current value is a pair")))
+
+(ert-deftest mutant-describe-single-element-list ()
+  (should
+   (equal (mutant--describe 'x (list 'foo))
+          "x is a global variable. Its current value is a list\ncontaining 1 value")))
