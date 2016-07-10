@@ -259,7 +259,7 @@ Mutates the value where possible."
     (with-current-buffer buffer
       ;; Need to set the major mode before we local variables.
       (mutant-mode)
-      (setq mutant--symbol symbol))
+      (setq-local mutant--symbol symbol))
     buffer))
 
 ;; TODO: support hash maps
