@@ -1,7 +1,7 @@
 ;;; mutant.el --- interactive value editing         -*- lexical-binding: t; -*-
 
-;; TODO: global variables
-;; TODO: hook into customize somehow
+;; TODO: prompt the user to choose between local and global variables
+;; TODO: hook into customize when users are choosing new values.
 
 ;; Copyright (C) 2016  
 
