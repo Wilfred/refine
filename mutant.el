@@ -81,6 +81,26 @@
   "Shallow conversion from a vector to a list."
   (mapcar #'identity vector))
 
+(defun mutant--format-element (element index-string)
+  "Given ELEMENT, an item from a list, and INDEX-STRING,
+a string marking our position in the containing list/vector,
+return a pretty, propertized string."
+  (let* (;; Pretty print ELEMENT.
+         (formatted-element (mutant--pretty-format element))
+         ;; Split out the lines, because only the first line will have
+         ;; the index.
+         (formatted-lines (s-lines formatted-element))
+         ;; Style the index.
+         (propertized-index (propertize index-string 'face 'mutant-dim-face))
+         ;; The first prefix is the index, the rest are just
+         ;; whitespace of the same length.
+         (leading-whitespace (make-string (length index-string) ?\ ))
+         (prefixes (cons propertized-index
+                         (-repeat (1- (length formatted-lines)) leading-whitespace)))
+         ;; Attach the prefix to each line.
+         (lines (--zip-with (format "%s %s" it other) prefixes formatted-lines)))
+    (s-join "\n" lines)))
+
 (defun mutant--format-value (value)
   "Given a list or vector VALUE, return a pretty propertized
 string listing the elements."
@@ -92,19 +112,18 @@ string listing the elements."
          (index-digits-required (ceiling (log length 10)))
          ;; If there are 10 or more items, make sure we print the
          ;; index with a width of 2, and so on.
-         (index-format-string (format "%%%dd" index-digits-required)))
-    (s-join
-     "\n"
-     (--map-indexed
-      (let* ((index (propertize
-                     (format index-format-string it-index)
-                     'face 'mutant-dim-face))
-             (raw-line (format
-                        "%s %s"
-                        index
-                        (mutant--pretty-format it))))
-        (propertize raw-line 'mutant-index it-index))
-      value))))
+         (index-format-string (format "%%%dd " index-digits-required))
+         ;; Pretty-print each element, along with an index.
+         (formatted-elements
+          (--map-indexed
+           (mutant--format-element it (format index-format-string it-index))
+           value))
+         ;; Propertize each element, so we can work out which element
+         ;; point is on.
+         (propertized-elements
+          (--map-indexed (propertize it 'mutant-index it-index)
+                         formatted-elements)))
+    (s-join "\n" propertized-elements)))
 
 (defun mutant--update (buffer symbol)
   "Update BUFFER with the current value of SYMBOL."
