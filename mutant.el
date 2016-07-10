@@ -330,6 +330,7 @@ With a numeric prefix, move that many items."
                   (units (if (= length 1) "value" "values")))
              (format "a %s containing %d %s"
                      type length units)))
+          ;; TODO: this case is never reached
           ((null value) "nil")
           (:else "an unsupported type"))))
     (s-word-wrap 60
