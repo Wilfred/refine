@@ -252,6 +252,46 @@ Mutates the value where possible."
     (mutant--insert mutant--symbol (1+ list-index) value)
     (mutant-update)))
 
+(defun mutant--move (distance)
+  "Move point DISTANCE items forward.
+If DISTANCE is negative, move backwards."
+  (let* ( ;; Work out which list index to go to.
+         (current-index (mutant--index-at-point))
+         (requested-index (+ current-index distance))
+         ;; Ensure we don't try to go outside the range allowed for
+         ;; this list.
+         (value (mutant--eval mutant--symbol))
+         (target-index (max 0 (min requested-index (safe-length value)))))
+    (beginning-of-line)
+    (if (> distance 0)
+        ;; Go forwards until we're on the first line of the requested value.
+        (while (not (equal (mutant--index-at-point) target-index))
+          (forward-line 1))
+      ;; Go backwards until we're on the first line of the requested
+      ;; value, even if it has multiple lines.
+      (progn
+        ;; Go to last line of the target value.
+        (while (not (equal (mutant--index-at-point) target-index))
+          (forward-line -1))
+        ;; Go past the target value.
+        (while (equal (mutant--index-at-point) target-index)
+          (forward-line -1))
+        ;; Move back to the first line of this value.
+        (forward-line 1)))
+    ))
+
+(defun mutant-next (arg)
+  "Move point to the next item.
+With a numeric prefix, move that many items."
+  (interactive "p")
+  (mutant--move arg))
+
+(defun mutant-previous (arg)
+  "Move point to the previous item.
+With a numeric prefix, move that many items."
+  (interactive "p")
+  (mutant--move (- arg)))
+
 (defun mutant--buffer (symbol)
   "Get or create a mutant buffer for SYMBOL."
   (assert (symbolp symbol))
@@ -323,6 +363,8 @@ Mutates the value where possible."
 (define-key mutant-mode-map (kbd "d") #'mutant-delete)
 (define-key mutant-mode-map (kbd "a") #'mutant-insert-after)
 (define-key mutant-mode-map (kbd "i") #'mutant-insert-before)
+(define-key mutant-mode-map (kbd "n") #'mutant-next)
+(define-key mutant-mode-map (kbd "p") #'mutant-previous)
 
 (provide 'mutant)
 ;;; mutant.el ends here
