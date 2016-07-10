@@ -15,5 +15,5 @@
   (should (equal (mutant--pretty-format (cons 1 2)) "'(1 . 2)")))
 
 (ert-deftest mutant-describe-dotted-list ()
-  (should (equal (mutant--describe (cons 1 2))
-                 "a pair")))
+  (should (equal (mutant--describe 'x (cons 1 2))
+                 "x is a global variable. Its current value is a pair")))
