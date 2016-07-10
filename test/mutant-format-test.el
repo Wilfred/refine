@@ -8,6 +8,10 @@
   (should (equal (mutant--pretty-format nil) "nil"))
   (should (equal (mutant--pretty-format t) "t")))
 
+(ert-deftest mutant-format-value-empty-list ()
+  "We should show a sensible value for an empty list."
+  (should (equal (mutant--format-value nil))))
+
 (ert-deftest mutant-format-string ()
   (should (equal (mutant--pretty-format "abc\"def") "\"abc\\\"def\"")))
 

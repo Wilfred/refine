@@ -113,7 +113,8 @@ string listing the elements."
     (setq value (mutant--vector->list value)))
 
   ;; TODO: Handle pairs.
-  (let* ((index-digits-required (ceiling (log (length value) 10)))
+  (let* ((index-digits-required
+          (if (null value) 0 (ceiling (log (length value) 10))))
          ;; If there are 10 or more items, make sure we print the
          ;; index with a width of 2, and so on.
          (index-format-string (format "%%%dd " index-digits-required))
