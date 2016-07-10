@@ -81,25 +81,30 @@
   "Shallow conversion from a vector to a list."
   (mapcar #'identity vector))
 
+(defun mutant--prefix-lines (prefix string)
+  "Return STRING with PREFIX prepended on the first line.
+If STRING contains multiple lines, indent subsequent lines
+to preserve vertical indentation."
+  (let* ((raw-lines (s-lines string))
+         ;; Whitespace of the same length as PREFIX.
+         (leading-whitespace (make-string (length prefix) ?\ ))
+         ;; Append a prefix to each line.
+         (prefixes
+          (cons prefix
+                (-repeat (1- (length raw-lines)) leading-whitespace)))
+         (lines (--zip-with (concat it other) prefixes raw-lines)))
+    (s-join "\n" lines)))
+
 (defun mutant--format-element (element index-string)
   "Given ELEMENT, an item from a list, and INDEX-STRING,
 a string marking our position in the containing list/vector,
 return a pretty, propertized string."
   (let* (;; Pretty print ELEMENT.
          (formatted-element (mutant--pretty-format element))
-         ;; Split out the lines, because only the first line will have
-         ;; the index.
-         (formatted-lines (s-lines formatted-element))
          ;; Style the index.
-         (propertized-index (propertize index-string 'face 'mutant-dim-face))
-         ;; The first prefix is the index, the rest are just
-         ;; whitespace of the same length.
-         (leading-whitespace (make-string (length index-string) ?\ ))
-         (prefixes (cons propertized-index
-                         (-repeat (1- (length formatted-lines)) leading-whitespace)))
-         ;; Attach the prefix to each line.
-         (lines (--zip-with (format "%s %s" it other) prefixes formatted-lines)))
-    (s-join "\n" lines)))
+         (propertized-index (propertize index-string 'face 'mutant-dim-face)))
+    (mutant--prefix-lines
+     (concat propertized-index " ") formatted-element)))
 
 (defun mutant--format-value (value)
   "Given a list or vector VALUE, return a pretty propertized
