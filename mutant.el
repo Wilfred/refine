@@ -261,9 +261,13 @@ Mutates the value where possible."
 ;; TODO: support hash maps
 (defun mutant--describe (symbol value)
   "Return a human-readable description for SYMBOL set to VALUE."
-  (let ((symbol-description
+  (let ((pretty-symbol
          (propertize (format "%s" symbol)
                      'face 'font-lock-variable-name-face))
+        (symbol-descripton
+         (if (local-variable-p symbol)
+             (format "a local variable in buffer %s" (current-buffer))
+           "a global variable"))
         (type-description
          (cond
           ((stringp value) "a string")
@@ -279,7 +283,10 @@ Mutates the value where possible."
                      type length units)))
           ((null value) "nil")
           (:else "an unsupported type"))))
-    (format "%s is %s" symbol-description type-description)))
+    (s-word-wrap 60
+                 (format "%s is %s. Its current value is %s"
+                         pretty-symbol symbol-descripton
+                         type-description))))
 
 ;;;###autoload
 (defun mutant ()
