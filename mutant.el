@@ -37,7 +37,7 @@
 
 (defun mutant--variables ()
   "Return a list of all symbols that are variables."
-  (let ((symbols))
+  (let (symbols)
     (mapatoms (lambda (symbol)
                 (when (boundp symbol)
                   (push symbol symbols))))
