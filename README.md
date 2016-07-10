@@ -1,6 +1,6 @@
 # Mutant
 
-**finally, an editor for Emacs!**
+***finally, an editor for Emacs!***
 
 Mutant provides a convenient UI for editing lists and vectors in
 Emacs.
