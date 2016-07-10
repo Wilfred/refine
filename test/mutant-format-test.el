@@ -10,7 +10,7 @@
 
 (ert-deftest mutant-format-value-empty-list ()
   "We should show a sensible value for an empty list."
-  (should (equal (mutant--format-value nil))))
+  (should (equal (mutant--format-value nil) "nil")))
 
 (ert-deftest mutant-format-string ()
   (should (equal (mutant--pretty-format "abc\"def") "\"abc\\\"def\"")))
