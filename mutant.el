@@ -115,10 +115,14 @@ string listing the elements."
 
    ((null value) "nil")
 
+   ((mutant--dotted-pair-p value)
+    (format "%s\n%s"
+            (mutant--format-element (car value) "CAR")
+            (mutant--format-element (cdr value) "CDR")))
+
    (t
-    ;; TODO: Handle pairs.
     (let* ((index-digits-required
-            (if (null value) 0 (ceiling (log (length value) 10))))
+            (if (null value) 0 (ceiling (log (safe-length value) 10))))
            ;; If there are 10 or more items, make sure we print the
            ;; index with a width of 2, and so on.
            (index-format-string (format "%%%dd " index-digits-required))
@@ -306,6 +310,12 @@ With a numeric prefix, move that many items."
       (mutant-mode)
       (setq-local mutant--symbol symbol))
     buffer))
+
+;; TODO: replace calls with just list-utils-improper-p
+(defun mutant--dotted-pair-p (value)
+  "Return t if VALUE is a dotted pair."
+  (and (consp value)
+       (not (consp (cdr value))) (not (null (cdr value)))))
 
 ;; TODO: support hash maps
 (defun mutant--describe (symbol value)
