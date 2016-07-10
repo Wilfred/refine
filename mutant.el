@@ -132,9 +132,7 @@ string listing the elements."
            (pos (point))
            buffer-read-only)
       (erase-buffer)
-      (insert (format "%s is %s:\n\n"
-                      (propertize (format "%s" symbol) 'face 'font-lock-variable-name-face)
-                      (mutant--describe value)))
+      (insert (format "%s:\n\n" (mutant--describe symbol value)))
       (insert (mutant--format-value value))
       (goto-char pos))))
 
@@ -261,22 +259,27 @@ Mutates the value where possible."
     buffer))
 
 ;; TODO: support hash maps
-(defun mutant--describe (value)
-  "Return a human-readable description for VALUE."
-  (cond
-   ((stringp value) "a string")
-   ((and (consp value) (not (consp (cdr value))))
-    "a pair")
-   ((and (consp value) (list-utils-cyclic-p value))
-    "an improper list")
-   ((sequencep value)
-    (let* ((type (if (vectorp value) "vector" "list"))
-           (length (length value))
-           (units (if (= length 1) "value" "values")))
-      (format "a %s containing %d %s"
-              type length units)))
-   ((null value) "nil")
-   (:else "an unsupported type")))
+(defun mutant--describe (symbol value)
+  "Return a human-readable description for SYMBOL set to VALUE."
+  (let ((symbol-description
+         (propertize (format "%s" symbol)
+                     'face 'font-lock-variable-name-face))
+        (type-description
+         (cond
+          ((stringp value) "a string")
+          ((and (consp value) (not (consp (cdr value))))
+           "a pair")
+          ((and (consp value) (list-utils-cyclic-p value))
+           "an improper list")
+          ((sequencep value)
+           (let* ((type (if (vectorp value) "vector" "list"))
+                  (length (length value))
+                  (units (if (= length 1) "value" "values")))
+             (format "a %s containing %d %s"
+                     type length units)))
+          ((null value) "nil")
+          (:else "an unsupported type"))))
+    (format "%s is %s" symbol-description type-description)))
 
 ;;;###autoload
 (defun mutant ()
