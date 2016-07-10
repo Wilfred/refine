@@ -1,4 +1,5 @@
 # Mutant
+[![Build Status](https://travis-ci.org/Wilfred/mutant.svg?branch=master)](https://travis-ci.org/Wilfred/mutant)
 
 ***finally, an editor for Emacs!***
 
