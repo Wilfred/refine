@@ -261,6 +261,35 @@ Mutates the value where possible."
     (mutant--insert mutant--symbol (1+ list-index) value)
     (mutant-update)))
 
+(defun mutant--swap (index1 index2)
+  "Switch the items at INDEX1 and INDEX2 in the current list."
+  (let* ((value (mutant--eval mutant--symbol))
+         (index1-element (nth index1 value))
+         (index2-element (nth index2 value)))
+    (setf (nth index2 value) index1-element)
+    (setf (nth index1 value) index2-element)))
+
+;; TODO: extract all these internal manipulation functions to a
+;; separate package. Each function should take a symbol rather than
+;; implicitly using `mutant--symbol'.
+(defun mutant--mov-element (index distance)
+  "Move the element at INDEX by DISTANCE positions.
+If DISTANCE is too big, move it as far as possible."
+  (let* ((value (mutant--eval mutant--symbol))
+         (target-index-raw (+ index distance))
+         ;; Ensure 0 <= target-index <= length - 1
+         (target-index (max (min target-index-raw (1- (length value))) 0)))
+    (while (not (equal index target-index))
+      (if (> distance 0)
+          ;; Moving forwards
+          (progn
+            (mutant--swap index (1+ index))
+            (incf index))
+        ;; Moving backwards
+        (progn
+          (mutant--swap index (1- index))
+          (decf index))))))
+
 (defun mutant--move (distance)
   "Move point DISTANCE items forward.
 If DISTANCE is negative, move backwards."
