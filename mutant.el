@@ -286,8 +286,7 @@ If DISTANCE is negative, move backwards."
         (while (equal (mutant--index-at-point) target-index)
           (forward-line -1))
         ;; Move back to the first line of this value.
-        (forward-line 1)))
-    ))
+        (forward-line 1)))))
 
 (defun mutant-next (arg)
   "Move point to the next item.
