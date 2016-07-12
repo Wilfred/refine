@@ -22,6 +22,10 @@
   (should (equal (mutant--describe 'x (cons 1 2))
                  "x is a global variable. Its current value is a pair")))
 
+(ert-deftest mutant-describe-nil ()
+  (should (equal (mutant--describe 'x nil)
+                 "x is a global variable. Its current value is the empty list")))
+
 (ert-deftest mutant-describe-single-element-list ()
   (should
    (equal (mutant--describe 'x (list 'foo))

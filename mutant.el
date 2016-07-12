@@ -330,6 +330,7 @@ With a numeric prefix, move that many items."
         (type-description
          (cond
           ((stringp value) "a string")
+          ((null value) "the empty list")
           ((and (consp value) (not (consp (cdr value))) (not (null (cdr value))))
            "a pair")
           ((and (consp value) (list-utils-cyclic-p value))
@@ -340,8 +341,6 @@ With a numeric prefix, move that many items."
                   (units (if (= length 1) "value" "values")))
              (format "a %s containing %d %s"
                      type length units)))
-          ;; TODO: this case is never reached
-          ((null value) "nil")
           (:else "an unsupported type"))))
     (s-word-wrap 60
                  (format "%s is %s. Its current value is %s"
