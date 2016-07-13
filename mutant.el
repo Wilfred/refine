@@ -333,6 +333,16 @@ If DISTANCE is negative, move backwards."
         ;; Move back to the first line of this value.
         (forward-line 1)))))
 
+(defun mutant-edit (new-value)
+  "Edit the current item in the list."
+  (interactive
+   (let* ((lst (mutant--eval mutant--symbol))
+          (current-value (nth (mutant--index-at-point) lst)))
+     (list (read--expression "New value: " (mutant--pretty-format current-value)))))
+  (eval
+   `(setf (nth ,(mutant--index-at-point) ,mutant--symbol) ,new-value))
+  (mutant-update))
+
 (defun mutant-next (arg)
   "Move point to the next item.
 With a numeric prefix, move that many items."
@@ -423,6 +433,7 @@ With a numeric prefix, move that many items."
 (define-key mutant-mode-map (kbd "g") #'mutant-update)
 
 ;; Modifying the list.
+(define-key mutant-mode-map (kbd "e") #'mutant-edit)
 (define-key mutant-mode-map (kbd "d") #'mutant-delete)
 (define-key mutant-mode-map (kbd "a") #'mutant-insert-after)
 (define-key mutant-mode-map (kbd "i") #'mutant-insert-before)
