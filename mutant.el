@@ -269,10 +269,26 @@ Mutates the value where possible."
     (setf (nth index2 value) index1-element)
     (setf (nth index1 value) index2-element)))
 
+(defun mutant-move-forward (arg)
+  "Move the current item one position forward.
+When called with a prefix, move that many positions."
+  (interactive "p")
+  ;; Move the element.
+  (mutant--move-element (mutant--index-at-point) arg)
+  (mutant-update)
+  ;; Move point to match.
+  (mutant-next arg))
+
+(defun mutant-move-backward (arg)
+  "Move the current item one position forward.
+When called with a prefix, move that many positions."
+  (interactive "p")
+  (mutant-move-forward (- arg)))
+
 ;; TODO: extract all these internal manipulation functions to a
 ;; separate package. Each function should take a symbol rather than
 ;; implicitly using `mutant--symbol'.
-(defun mutant--mov-element (index distance)
+(defun mutant--move-element (index distance)
   "Move the element at INDEX by DISTANCE positions.
 If DISTANCE is too big, move it as far as possible."
   (let* ((value (mutant--eval mutant--symbol))
@@ -402,11 +418,21 @@ With a numeric prefix, move that many items."
 ;; TODO: get this popup working.
 ;; (define-key mutant-mode-map (kbd "?") #'mutant-popup)
 
+;; Buffer-level operations.
 (define-key mutant-mode-map (kbd "q") #'kill-this-buffer)
 (define-key mutant-mode-map (kbd "g") #'mutant-update)
+
+;; Modifying the list.
 (define-key mutant-mode-map (kbd "d") #'mutant-delete)
 (define-key mutant-mode-map (kbd "a") #'mutant-insert-after)
 (define-key mutant-mode-map (kbd "i") #'mutant-insert-before)
+;; Provide keybindings familiar to lispy users, as well as to move-dup users.
+(define-key mutant-mode-map (kbd "<M-down>") #'mutant-move-forward)
+(define-key mutant-mode-map (kbd "s") #'mutant-move-forward)
+(define-key mutant-mode-map (kbd "<M-up>") #'mutant-move-backward)
+(define-key mutant-mode-map (kbd "w") #'mutant-move-backward)
+
+;; Moving around.
 (define-key mutant-mode-map (kbd "n") #'mutant-next)
 (define-key mutant-mode-map (kbd "p") #'mutant-previous)
 
