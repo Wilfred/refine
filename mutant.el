@@ -384,7 +384,7 @@ With a numeric prefix, move that many items."
         (type-description
          (cond
           ((stringp value) "a string")
-          ((null value) "the empty list")
+          ((null value) "nil")
           ((and (consp value) (not (consp (cdr value))) (not (null (cdr value))))
            "a pair")
           ((and (consp value) (list-utils-cyclic-p value))

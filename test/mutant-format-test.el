@@ -24,7 +24,7 @@
 
 (ert-deftest mutant-describe-nil ()
   (should (equal (mutant--describe 'x nil)
-                 "x is a global variable. Its current value is the empty list")))
+                 "x is a global variable. Its current value is nil")))
 
 (ert-deftest mutant-describe-single-element-list ()
   (should
