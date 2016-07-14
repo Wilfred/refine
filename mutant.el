@@ -336,16 +336,17 @@ If DISTANCE is too big, move it as far as possible."
   "Move point DISTANCE items forward.
 If DISTANCE is negative, move backwards."
   (let* ( ;; Work out which list index to go to.
-         (current-index (mutant--index-at-point))
+         (current-index (or (mutant--index-at-point) -1))
          (requested-index (+ current-index distance))
          ;; Ensure we don't try to go outside the range allowed for
          ;; this list.
          (value (mutant--eval mutant--symbol))
-         (target-index (max 0 (min requested-index (safe-length value)))))
+         (target-index (max 0 (min requested-index (1- (safe-length value))))))
     (beginning-of-line)
     (if (> distance 0)
         ;; Go forwards until we're on the first line of the requested value.
-        (while (not (equal (mutant--index-at-point) target-index))
+        (while (or (null (mutant--index-at-point))
+                   (< (mutant--index-at-point) target-index))
           (forward-line 1))
       ;; Go backwards until we're on the first line of the requested
       ;; value, even if it has multiple lines.
