@@ -27,3 +27,7 @@ list). In these cases, mutant will overwrite your variable.
 ## License
 
 GPLv3.
+
+## Installation
+
+Add mutant.el to `load-path`. MELPA in progress.
