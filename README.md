@@ -8,7 +8,7 @@ Mutant provides a convenient UI for editing lists.
 ![edit_hook](edit_hook.gif)
 
 Mutant is great for editing large lists, such as hooks. In the above
-example, I insert and edit some values in `prog-mode-hook`.
+example, I insert and edit values in `prog-mode-hook`.
 
 ![kill_ring](kill_ring.gif)
 
