@@ -1,4 +1,4 @@
-;;; mutant.el --- interactive value editing         -*- lexical-binding: t; -*-
+;;; refine.el --- interactive value editing         -*- lexical-binding: t; -*-
 
 ;; TODO: prompt the user to choose between local and global variables
 ;; TODO: hook into customize when users are choosing new values.
@@ -24,7 +24,7 @@
 
 ;;; Commentary:
 
-;; mutant provides an interactive UI for manipulating lists.
+;; refine provides an interactive UI for manipulating lists.
 
 ;;; Code:
 
@@ -35,7 +35,7 @@
   (require 'cl)
   (require 'magit-popup))
 
-(defun mutant--variables ()
+(defun refine--variables ()
   "Return a list of all symbols that are variables."
   (let (symbols)
     (mapatoms (lambda (symbol)
@@ -43,7 +43,7 @@
                   (push symbol symbols))))
     symbols))
 
-(defun mutant--pretty-format (value)
+(defun refine--pretty-format (value)
   "Pretty print VALUE as a string."
   (let ((cl-formatted (with-temp-buffer
                         (cl-prettyprint value)
@@ -63,23 +63,23 @@
           (t
            cl-formatted))))
 
-(defun mutant--eval (symbol)
+(defun refine--eval (symbol)
   "Return the value of SYMBOL."
   (eval symbol t))
 
-(defface mutant-index-face
+(defface refine-index-face
   '((((class color) (background light))
      :foreground "grey50")
     (((class color) (background dark))
      :foreground "grey50"))
-  "Face for metadata in mutant results buffers."
-  :group 'mutant)
+  "Face for metadata in refine results buffers."
+  :group 'refine)
 
-(defun mutant--vector->list (vector)
+(defun refine--vector->list (vector)
   "Shallow conversion from a vector to a list."
   (mapcar #'identity vector))
 
-(defun mutant--prefix-lines (prefix string)
+(defun refine--prefix-lines (prefix string)
   "Return STRING with PREFIX prepended on the first line.
 If STRING contains multiple lines, indent subsequent lines
 to preserve vertical indentation."
@@ -93,30 +93,30 @@ to preserve vertical indentation."
          (lines (--zip-with (concat it other) prefixes raw-lines)))
     (s-join "\n" lines)))
 
-(defun mutant--format-element (element index-string)
+(defun refine--format-element (element index-string)
   "Given ELEMENT, an item from a list, and INDEX-STRING,
 a string marking our position in the containing list/vector,
 return a pretty, propertized string."
   (let* (;; Pretty print ELEMENT.
-         (formatted-element (mutant--pretty-format element))
+         (formatted-element (refine--pretty-format element))
          ;; Style the index.
-         (propertized-index (propertize index-string 'face 'mutant-index-face)))
-    (mutant--prefix-lines
+         (propertized-index (propertize index-string 'face 'refine-index-face)))
+    (refine--prefix-lines
      (concat propertized-index " ") formatted-element)))
 
-(defun mutant--format-value (value)
+(defun refine--format-value (value)
   "Given a list or vector VALUE, return a pretty propertized
 string listing the elements."
   (cond
    ((vectorp value)
-    (mutant--format-value (mutant--vector->list value)))
+    (refine--format-value (refine--vector->list value)))
 
    ((null value) "nil")
 
-   ((mutant--dotted-pair-p value)
+   ((refine--dotted-pair-p value)
     (format "%s\n%s"
-            (mutant--format-element (car value) "CAR")
-            (mutant--format-element (cdr value) "CDR")))
+            (refine--format-element (car value) "CAR")
+            (refine--format-element (cdr value) "CDR")))
 
    (t
     (let* ((index-digits-required
@@ -127,37 +127,37 @@ string listing the elements."
            ;; Pretty-print each element, along with an index.
            (formatted-elements
             (--map-indexed
-             (mutant--format-element it (format index-format-string it-index))
+             (refine--format-element it (format index-format-string it-index))
              value))
            ;; Propertize each element, so we can work out which element
            ;; point is on.
            (propertized-elements
-            (--map-indexed (propertize it 'mutant-index it-index)
+            (--map-indexed (propertize it 'refine-index it-index)
                            formatted-elements)))
       (s-join "\n" propertized-elements)))))
 
-(defun mutant--update (buffer symbol)
+(defun refine--update (buffer symbol)
   "Update BUFFER with the current value of SYMBOL."
   (with-current-buffer buffer
-    (let* ((value (mutant--eval symbol))
+    (let* ((value (refine--eval symbol))
            (pos (point))
            buffer-read-only)
       (erase-buffer)
-      (insert (format "%s:\n\n" (mutant--describe symbol value)))
-      (insert (mutant--format-value value))
+      (insert (format "%s:\n\n" (refine--describe symbol value)))
+      (insert (refine--format-value value))
       (goto-char pos))))
 
-(defvar-local mutant--symbol nil
+(defvar-local refine--symbol nil
   "The symbol being inspected in the current buffer.")
 
-(defun mutant-update ()
-  "Update the current mutant buffer."
+(defun refine-update ()
+  "Update the current refine buffer."
   (interactive)
-  (unless (eq major-mode #'mutant-mode)
-    (user-error "mutant-update must be run in a mutant buffer"))
-  (mutant--update (current-buffer) mutant--symbol))
+  (unless (eq major-mode #'refine-mode)
+    (user-error "refine-update must be run in a refine buffer"))
+  (refine--update (current-buffer) refine--symbol))
 
-(defun mutant--insert-list (list index value)
+(defun refine--insert-list (list index value)
   "Insert VALUE at INDEX in LIST.
 This mutates the list."
   ;; We can't handle empty lists: there's no cons cell to mutate.
@@ -180,14 +180,14 @@ This mutates the list."
         (setcar list value)
         (setcdr list (cons old-car old-cdr))))))
 
-(defun mutant--insert (symbol index value)
+(defun refine--insert (symbol index value)
   "Insert VALUE at INDEX in list variable SYMBOL.
 This mutates the list.
 
 If SYMBOL is nil, assigns to SYMBOL instead."
   (interactive)
   (assert (symbolp symbol))
-  (let* ((list (mutant--eval symbol))
+  (let* ((list (refine--eval symbol))
          (length (safe-length list)))
     ;; `symbol' must be a list that's long enough.
     (assert (and (consp list) (>= length index)))
@@ -196,23 +196,23 @@ If SYMBOL is nil, assigns to SYMBOL instead."
      ;; If list is nil, we can't modify destructively.
      ((= length 0) (set symbol (list value)))
 
-     (t (mutant--insert-list list index value)))))
+     (t (refine--insert-list list index value)))))
 
-(defun mutant--vector-pop (symbol index)
+(defun refine--vector-pop (symbol index)
   "Remove the item at INDEX from vector variable SYMBOL.
 
 This creates a new vector and assigns it to SYMBOL. Vectors have
 fixed length, see *info* (elisp) Arrays."
-  (let* ((vector (mutant--eval symbol))
+  (let* ((vector (refine--eval symbol))
          (length (length vector)))
     (assert (and (vectorp vector) (< index length)))
 
-    (let* ((all-items (mutant--vector->list vector))
+    (let* ((all-items (refine--vector->list vector))
            (items (--reject (= it-index index) all-items)))
       (set symbol (apply #'vector items)))))
 
 
-(defun mutant--list-pop (list index)
+(defun refine--list-pop (list index)
   "Remove the item at INDEX from LIST.
 This mutates the list."
   (let* ((length (safe-length list)))
@@ -234,95 +234,95 @@ This mutates the list."
           (setcar list new-car)
           (setcdr list new-cdr))))))
 
-(defun mutant--pop (symbol index)
+(defun refine--pop (symbol index)
   "Remote the item at INDEX in vectory/list variable SYMBOL.
 Mutates the value where possible."
-  (let ((value (mutant--eval symbol)))
+  (let ((value (refine--eval symbol)))
     (cond ((vectorp value)
-           (mutant--vector-pop symbol index))
+           (refine--vector-pop symbol index))
           ((equal (length value) 1)
            ;; We can't pop from a one-element list in-place, because a
            ;; cons cell requires a non-empty list.
            (set symbol nil))
           (t 
-           (mutant--list-pop value index)))))
+           (refine--list-pop value index)))))
 
-(defun mutant--index-at-point ()
+(defun refine--index-at-point ()
   "Get the index of the list item at point."
   (save-excursion
     (when (eolp)
       (backward-char 1))
-    (get-text-property (point) 'mutant-index)))
+    (get-text-property (point) 'refine-index)))
 
-(defun mutant--read-eval-expr (prompt &optional initial-contents)
+(defun refine--read-eval-expr (prompt &optional initial-contents)
   "Read a lisp expression from the minibuffer and evaluate it.
 Equivalent to interactive \"X\"."
   (eval (read--expression prompt initial-contents)))
 
-(defun mutant-delete ()
+(defun refine-delete ()
   "Remove the current list item at point."
   (interactive)
-  (-when-let (list-index (mutant--index-at-point))
-    (mutant--pop mutant--symbol list-index)
-    (mutant-update)))
+  (-when-let (list-index (refine--index-at-point))
+    (refine--pop refine--symbol list-index)
+    (refine-update)))
 
 ;; TODO: inserts should support vectors too.
-(defun mutant-insert (value)
+(defun refine-insert (value)
   "Insert a new item before the list item at point."
   (interactive
-   (let ((index (mutant--index-at-point)))
+   (let ((index (refine--index-at-point)))
      (if index
-         (list (mutant--read-eval-expr
-                (format "Value to insert at %s: " (mutant--index-at-point))))
+         (list (refine--read-eval-expr
+                (format "Value to insert at %s: " (refine--index-at-point))))
        (user-error "No value here"))))
-  (-when-let (list-index (mutant--index-at-point))
-    (mutant--insert mutant--symbol list-index value)
-    (mutant-update)))
+  (-when-let (list-index (refine--index-at-point))
+    (refine--insert refine--symbol list-index value)
+    (refine-update)))
 
-(defun mutant-insert-after (value)
+(defun refine-insert-after (value)
   "Insert a new item before the list item at point."
   (interactive
-   (let ((index (mutant--index-at-point)))
+   (let ((index (refine--index-at-point)))
      (if index
-         (list (mutant--read-eval-expr
-                (format "Value to insert at %s: " (1+ (mutant--index-at-point)))))
+         (list (refine--read-eval-expr
+                (format "Value to insert at %s: " (1+ (refine--index-at-point)))))
        (user-error "No value here"))))
-  (-when-let (list-index (mutant--index-at-point))
-    (mutant--insert mutant--symbol (1+ list-index) value)
-    (mutant-update))
-  (mutant-next 1))
+  (-when-let (list-index (refine--index-at-point))
+    (refine--insert refine--symbol (1+ list-index) value)
+    (refine-update))
+  (refine-next 1))
 
-(defun mutant--swap (index1 index2)
+(defun refine--swap (index1 index2)
   "Switch the items at INDEX1 and INDEX2 in the current list."
-  (let* ((value (mutant--eval mutant--symbol))
+  (let* ((value (refine--eval refine--symbol))
          (index1-element (nth index1 value))
          (index2-element (nth index2 value)))
     (setf (nth index2 value) index1-element)
     (setf (nth index1 value) index2-element)))
 
-(defun mutant-move-forward (arg)
+(defun refine-move-forward (arg)
   "Move the current item one position forward.
 When called with a prefix, move that many positions."
   (interactive "p")
   ;; Move the element.
-  (mutant--move-element (mutant--index-at-point) arg)
-  (mutant-update)
+  (refine--move-element (refine--index-at-point) arg)
+  (refine-update)
   ;; Move point to match.
-  (mutant-next arg))
+  (refine-next arg))
 
-(defun mutant-move-backward (arg)
+(defun refine-move-backward (arg)
   "Move the current item one position forward.
 When called with a prefix, move that many positions."
   (interactive "p")
-  (mutant-move-forward (- arg)))
+  (refine-move-forward (- arg)))
 
 ;; TODO: extract all these internal manipulation functions to a
 ;; separate package. Each function should take a symbol rather than
-;; implicitly using `mutant--symbol'.
-(defun mutant--move-element (index distance)
+;; implicitly using `refine--symbol'.
+(defun refine--move-element (index distance)
   "Move the element at INDEX by DISTANCE positions.
 If DISTANCE is too big, move it as far as possible."
-  (let* ((value (mutant--eval mutant--symbol))
+  (let* ((value (refine--eval refine--symbol))
          (target-index-raw (+ index distance))
          ;; Ensure 0 <= target-index <= length - 1
          (target-index (max (min target-index-raw (1- (length value))) 0)))
@@ -330,81 +330,81 @@ If DISTANCE is too big, move it as far as possible."
       (if (> distance 0)
           ;; Moving forwards
           (progn
-            (mutant--swap index (1+ index))
+            (refine--swap index (1+ index))
             (incf index))
         ;; Moving backwards
         (progn
-          (mutant--swap index (1- index))
+          (refine--swap index (1- index))
           (decf index))))))
 
-(defun mutant--move (distance)
+(defun refine--move (distance)
   "Move point DISTANCE items forward.
 If DISTANCE is negative, move backwards."
   (let* ( ;; Work out which list index to go to.
-         (current-index (or (mutant--index-at-point) -1))
+         (current-index (or (refine--index-at-point) -1))
          (requested-index (+ current-index distance))
          ;; Ensure we don't try to go outside the range allowed for
          ;; this list.
-         (value (mutant--eval mutant--symbol))
+         (value (refine--eval refine--symbol))
          (target-index (max 0 (min requested-index (1- (safe-length value))))))
     (beginning-of-line)
     (if (> distance 0)
         ;; Go forwards until we're on the first line of the requested value.
-        (while (or (null (mutant--index-at-point))
-                   (< (mutant--index-at-point) target-index))
+        (while (or (null (refine--index-at-point))
+                   (< (refine--index-at-point) target-index))
           (forward-line 1))
       ;; Go backwards until we're on the first line of the requested
       ;; value, even if it has multiple lines.
       (progn
         ;; Go to last line of the target value.
-        (while (not (equal (mutant--index-at-point) target-index))
+        (while (not (equal (refine--index-at-point) target-index))
           (forward-line -1))
         ;; Go past the target value.
-        (while (equal (mutant--index-at-point) target-index)
+        (while (equal (refine--index-at-point) target-index)
           (forward-line -1))
         ;; Move back to the first line of this value.
         (forward-line 1)))))
 
-(defun mutant-edit (new-value)
+(defun refine-edit (new-value)
   "Edit the current item in the list."
   (interactive
-   (let* ((lst (mutant--eval mutant--symbol))
-          (current-value (nth (mutant--index-at-point) lst)))
-     (list (read--expression "New value: " (mutant--pretty-format current-value)))))
+   (let* ((lst (refine--eval refine--symbol))
+          (current-value (nth (refine--index-at-point) lst)))
+     (list (read--expression "New value: " (refine--pretty-format current-value)))))
   (eval
-   `(setf (nth ,(mutant--index-at-point) ,mutant--symbol) ,new-value))
-  (mutant-update))
+   `(setf (nth ,(refine--index-at-point) ,refine--symbol) ,new-value))
+  (refine-update))
 
-(defun mutant-next (arg)
+(defun refine-next (arg)
   "Move point to the next item.
 With a numeric prefix, move that many items."
   (interactive "p")
-  (mutant--move arg))
+  (refine--move arg))
 
-(defun mutant-previous (arg)
+(defun refine-previous (arg)
   "Move point to the previous item.
 With a numeric prefix, move that many items."
   (interactive "p")
-  (mutant--move (- arg)))
+  (refine--move (- arg)))
 
-(defun mutant--buffer (symbol)
-  "Get or create a mutant buffer for SYMBOL."
+(defun refine--buffer (symbol)
+  "Get or create a refine buffer for SYMBOL."
   (assert (symbolp symbol))
-  (let ((buffer (get-buffer-create (format "*mutant: %s*" symbol))))
+  (let ((buffer (get-buffer-create (format "*refine: %s*" symbol))))
     (with-current-buffer buffer
       ;; Need to set the major mode before we local variables.
-      (mutant-mode)
-      (setq-local mutant--symbol symbol))
+      (refine-mode)
+      (setq-local refine--symbol symbol))
     buffer))
 
 ;; TODO: replace calls with just list-utils-improper-p
-(defun mutant--dotted-pair-p (value)
+(defun refine--dotted-pair-p (value)
   "Return t if VALUE is a dotted pair."
   (and (consp value)
        (not (consp (cdr value))) (not (null (cdr value)))))
 
 ;; TODO: support hash maps
-(defun mutant--describe (symbol value)
+(defun refine--describe (symbol value)
   "Return a human-readable description for SYMBOL set to VALUE."
   (let ((pretty-symbol
          (propertize (format "%s" symbol)
@@ -434,50 +434,50 @@ With a numeric prefix, move that many items."
                          type-description))))
 
 ;;;###autoload
-(defun mutant ()
+(defun refine ()
   "Interactively edit the value of a symbol \(usually a list\)."
   (interactive)
-  (let* ((symbol (read (completing-read "Variable: " (mutant--variables))))
-         (buf (mutant--buffer symbol)))
-    (mutant--update buf symbol)
+  (let* ((symbol (read (completing-read "Variable: " (refine--variables))))
+         (buf (refine--buffer symbol)))
+    (refine--update buf symbol)
     (switch-to-buffer buf)))
 
-(defvar mutant-mode-syntax-table
+(defvar refine-mode-syntax-table
   (let ((table (make-syntax-table)))
     (modify-syntax-entry ?\" "\"" table)
     table))
 
-(define-derived-mode mutant-mode fundamental-mode "Mutant"
+(define-derived-mode refine-mode fundamental-mode "Refine"
   "A major mode for interactively editing elisp values."
-  :syntax-table mutant-mode-syntax-table
+  :syntax-table refine-mode-syntax-table
   (setq buffer-read-only t))
 
-(magit-define-popup mutant-popup
+(magit-define-popup refine-popup
   "Popup console for changing items in a list."
-  :actions '((?g "Reload" mutant-update)
-             (?d "Delete" mutant-delete)))
+  :actions '((?g "Reload" refine-update)
+             (?d "Delete" refine-delete)))
 
 ;; TODO: get this popup working.
-;; (define-key mutant-mode-map (kbd "?") #'mutant-popup)
+;; (define-key refine-mode-map (kbd "?") #'refine-popup)
 
 ;; Buffer-level operations.
-(define-key mutant-mode-map (kbd "q") #'kill-this-buffer)
-(define-key mutant-mode-map (kbd "g") #'mutant-update)
+(define-key refine-mode-map (kbd "q") #'kill-this-buffer)
+(define-key refine-mode-map (kbd "g") #'refine-update)
 
 ;; Modifying the list.
-(define-key mutant-mode-map (kbd "e") #'mutant-edit)
-(define-key mutant-mode-map (kbd "k") #'mutant-delete)
-(define-key mutant-mode-map (kbd "a") #'mutant-insert-after)
-(define-key mutant-mode-map (kbd "i") #'mutant-insert)
+(define-key refine-mode-map (kbd "e") #'refine-edit)
+(define-key refine-mode-map (kbd "k") #'refine-delete)
+(define-key refine-mode-map (kbd "a") #'refine-insert-after)
+(define-key refine-mode-map (kbd "i") #'refine-insert)
 ;; Provide keybindings familiar to lispy users, as well as to move-dup users.
-(define-key mutant-mode-map (kbd "<M-down>") #'mutant-move-forward)
-(define-key mutant-mode-map (kbd "s") #'mutant-move-forward)
-(define-key mutant-mode-map (kbd "<M-up>") #'mutant-move-backward)
-(define-key mutant-mode-map (kbd "w") #'mutant-move-backward)
+(define-key refine-mode-map (kbd "<M-down>") #'refine-move-forward)
+(define-key refine-mode-map (kbd "s") #'refine-move-forward)
+(define-key refine-mode-map (kbd "<M-up>") #'refine-move-backward)
+(define-key refine-mode-map (kbd "w") #'refine-move-backward)
 
 ;; Moving around.
-(define-key mutant-mode-map (kbd "n") #'mutant-next)
-(define-key mutant-mode-map (kbd "p") #'mutant-previous)
+(define-key refine-mode-map (kbd "n") #'refine-next)
+(define-key refine-mode-map (kbd "p") #'refine-previous)
 
-(provide 'mutant)
-;;; mutant.el ends here
+(provide 'refine)
+;;; refine.el ends here
