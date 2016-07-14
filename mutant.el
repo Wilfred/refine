@@ -65,7 +65,6 @@
 
 (defun mutant--eval (symbol)
   "Return the value of SYMBOL."
-  ;; TODO: handle buffer-local variables
   (eval symbol t))
 
 ;; TODO: name for index, i.e. purpose, not colour.
