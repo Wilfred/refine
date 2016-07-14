@@ -283,7 +283,8 @@ Equivalent to interactive \"X\"."
   (interactive "XValue to insert after this: ")
   (-when-let (list-index (mutant--index-at-point))
     (mutant--insert mutant--symbol (1+ list-index) value)
-    (mutant-update)))
+    (mutant-update))
+  (mutant-next 1))
 
 (defun mutant--swap (index1 index2)
   "Switch the items at INDEX1 and INDEX2 in the current list."
