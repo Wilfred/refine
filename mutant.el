@@ -243,7 +243,11 @@ Mutates the value where possible."
     (mutant--list-pop symbol index)))
 
 (defun mutant--index-at-point ()
-  (get-text-property (point) 'mutant-index))
+  "Get the index of the list item at point."
+  (save-excursion
+    (when (eolp)
+      (backward-char 1))
+    (get-text-property (point) 'mutant-index)))
 
 (defun mutant--read-eval-expr (prompt &optional initial-contents)
   "Read a lisp expression from the minibuffer and evaluate it.
