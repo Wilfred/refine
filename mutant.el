@@ -67,8 +67,7 @@
   "Return the value of SYMBOL."
   (eval symbol t))
 
-;; TODO: name for index, i.e. purpose, not colour.
-(defface mutant-dim-face
+(defface mutant-index-face
   '((((class color) (background light))
      :foreground "grey50")
     (((class color) (background dark))
@@ -101,7 +100,7 @@ return a pretty, propertized string."
   (let* (;; Pretty print ELEMENT.
          (formatted-element (mutant--pretty-format element))
          ;; Style the index.
-         (propertized-index (propertize index-string 'face 'mutant-dim-face)))
+         (propertized-index (propertize index-string 'face 'mutant-index-face)))
     (mutant--prefix-lines
      (concat propertized-index " ") formatted-element)))
 
