@@ -461,7 +461,7 @@ With a numeric prefix, move that many items."
 
 ;; Modifying the list.
 (define-key mutant-mode-map (kbd "e") #'mutant-edit)
-(define-key mutant-mode-map (kbd "d") #'mutant-delete)
+(define-key mutant-mode-map (kbd "k") #'mutant-delete)
 (define-key mutant-mode-map (kbd "a") #'mutant-insert-after)
 (define-key mutant-mode-map (kbd "i") #'mutant-insert)
 ;; Provide keybindings familiar to lispy users, as well as to move-dup users.
