@@ -159,6 +159,29 @@ string listing the elements."
     (user-error "mutant-update must be run in a mutant buffer"))
   (mutant--update (current-buffer) mutant--symbol))
 
+(defun mutant--insert-list (list index value)
+  "Insert VALUE at INDEX in LIST.
+This mutates the list."
+  ;; We can't handle empty lists: there's no cons cell to mutate.
+  (assert (consp list))
+
+  (if (= index (length list))
+      ;; We're appending to the list.
+      (progn
+        ;; Find the last cons cell.
+        (setq list (last list))
+        ;; Append the value requested.
+        (setcdr list (cons value nil)))
+    ;; Otherwise, insert in-place.
+    (progn
+      ;; Walk down the list until we're one element away from our
+      ;; target.
+      (setq list (nthcdr index list))
+      ;; Mutate this cons cell.
+      (-let [(old-car . old-cdr) list]
+        (setcar list value)
+        (setcdr list (cons old-car old-cdr))))))
+
 (defun mutant--insert (symbol index value)
   "Insert VALUE at INDEX in list variable SYMBOL.
 This mutates the list.
@@ -175,22 +198,7 @@ If SYMBOL is nil, assigns to SYMBOL instead."
      ;; If list is nil, we can't modify destructively.
      ((= length 0) (set symbol (list value)))
 
-     ;; Append to the list.
-     ((= index length)
-      ;; Find the last cons cell.
-      (setq list (last list))
-      ;; Append the value requested.
-      (setcdr list (cons value nil)))
-
-     ;; Insert inplace.
-     (t
-      ;; Walk down the list until we're one element away from our
-      ;; target.
-      (setq list (nthcdr index list))
-      ;; Mutate this cons cell.
-      (-let [(old-car . old-cdr) list]
-        (setcar list value)
-        (setcdr list (cons old-car old-cdr)))))))
+     (t (mutant--insert-list list index value)))))
 
 (defun mutant--vector-pop (symbol index)
   "Remove the item at INDEX from vector variable SYMBOL.
