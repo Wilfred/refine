@@ -212,35 +212,40 @@ fixed length, see *info* (elisp) Arrays."
       (set symbol (apply #'vector items)))))
 
 
-(defun mutant--list-pop (symbol index)
-  "Remove the item at INDEX from list variable SYMBOL.
-This mutates the list.
+(defun mutant--list-pop (list index)
+  "Remove the item at INDEX from LIST.
+This mutates the list."
+  (let* ((length (safe-length list)))
+    (assert (and (consp list) (> length 1) (< index length)))
 
-If the list only has one element, assign nil to SYMBOL instead."
-  (assert (symbolp symbol))
-  (let* ((list (mutant--eval symbol))
-         (length (safe-length list)))
-    ;; `symbol' must be a list that's long enough.
-    (assert (and (consp list) (< index length)))
-
-    (cond
-     ((= length 0) (user-error "Can't pop from an empty list"))
-     ((= length 1) (set symbol nil))
-     (t
-      ;; Walk down the list until we're one element away from our
-      ;; target.
-      (setq list (nthcdr index list))
-      ;; Mutate this cons cell.
-      (-let [(_ new-car . new-cdr) list]
-        (setcar list new-car)
-        (setcdr list new-cdr))))))
+    (if (equal index (1- length))
+        ;; We're popping the very last cons cell.
+        (progn
+          (setq list (nthcdr (1- index) list))
+          (setcdr list nil))
+      (progn
+        ;; Walk down the list until we're one element away from our
+        ;; target.
+        (setq list (nthcdr index list))
+        
+        ;; Mutate this cons cell to skip over the popped item and point
+        ;; directly at the next cell.
+        (-let [(_ new-car . new-cdr) list]
+          (setcar list new-car)
+          (setcdr list new-cdr))))))
 
 (defun mutant--pop (symbol index)
   "Remote the item at INDEX in vectory/list variable SYMBOL.
 Mutates the value where possible."
-  (if (vectorp (mutant--eval symbol))
-      (mutant--vector-pop symbol index)
-    (mutant--list-pop symbol index)))
+  (let ((value (mutant--eval symbol)))
+    (cond ((vectorp value)
+           (mutant--vector-pop symbol index))
+          ((equal (length value) 1)
+           ;; We can't pop from a one-element list in-place, because a
+           ;; cons cell requires a non-empty list.
+           (set symbol nil))
+          (t 
+           (mutant--list-pop value index)))))
 
 (defun mutant--index-at-point ()
   "Get the index of the list item at point."
