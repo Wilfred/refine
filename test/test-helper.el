@@ -9,8 +9,8 @@
 (require 'ert)
 (require 'f)
 
-(let ((mutant-dir (f-parent (f-dirname (f-this-file)))))
-  (add-to-list 'load-path mutant-dir))
+(let ((refine-dir (f-parent (f-dirname (f-this-file)))))
+  (add-to-list 'load-path refine-dir))
 
 (provide 'test-helper)
 ;;; test-helper.el ends here

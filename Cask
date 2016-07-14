@@ -1,6 +1,6 @@
 (source melpa)
 
-(package-file "mutant.el")
+(package-file "refine.el")
 
 (depends-on "s")
 (depends-on "dash")
