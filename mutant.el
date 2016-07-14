@@ -247,6 +247,11 @@ Mutates the value where possible."
 (defun mutant--index-at-point ()
   (get-text-property (point) 'mutant-index))
 
+(defun mutant--read-eval-expr (prompt &optional initial-contents)
+  "Read a lisp expression from the minibuffer and evaluate it.
+Equivalent to interactive \"X\"."
+  (eval (read--expression prompt initial-contents)))
+
 (defun mutant-delete ()
   "Remove the current list item at point."
   (interactive)
@@ -257,13 +262,24 @@ Mutates the value where possible."
 ;; TODO: inserts should support vectors too.
 (defun mutant-insert (value)
   "Insert a new item before the list item at point."
-  (interactive "XValue to insert before this: ")
+  (interactive
+   (let ((index (mutant--index-at-point)))
+     (if index
+         (list (mutant--read-eval-expr
+                (format "Value to insert at %s: " (mutant--index-at-point))))
+       (user-error "No value here"))))
   (-when-let (list-index (mutant--index-at-point))
     (mutant--insert mutant--symbol list-index value)
     (mutant-update)))
 
 (defun mutant-insert-after (value)
   "Insert a new item before the list item at point."
+  (interactive
+   (let ((index (mutant--index-at-point)))
+     (if index
+         (list (mutant--read-eval-expr
+                (format "Value to insert at %s: " (1+ (mutant--index-at-point)))))
+       (user-error "No value here"))))
   (interactive "XValue to insert after this: ")
   (-when-let (list-index (mutant--index-at-point))
     (mutant--insert mutant--symbol (1+ list-index) value)
