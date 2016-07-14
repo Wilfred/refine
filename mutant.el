@@ -278,7 +278,6 @@ Equivalent to interactive \"X\"."
          (list (mutant--read-eval-expr
                 (format "Value to insert at %s: " (1+ (mutant--index-at-point)))))
        (user-error "No value here"))))
-  (interactive "XValue to insert after this: ")
   (-when-let (list-index (mutant--index-at-point))
     (mutant--insert mutant--symbol (1+ list-index) value)
     (mutant-update))
