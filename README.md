@@ -30,4 +30,4 @@ GPLv3.
 
 ## Installation
 
-Add refine.el to `load-path`. MELPA in progress.
+Add refine.el to `load-path`. MELPA [in progress](https://github.com/melpa/melpa/pull/4046).
