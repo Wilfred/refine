@@ -1,5 +1,6 @@
 # Refine
 [![Build Status](https://travis-ci.org/Wilfred/refine.svg?branch=master)](https://travis-ci.org/Wilfred/refine)
+[![Coverage Status](https://coveralls.io/repos/github/Wilfred/refine/badge.svg?branch=master)](https://coveralls.io/github/Wilfred/refine?branch=master)
 
 ***finally, an editor for Emacs!***
 
