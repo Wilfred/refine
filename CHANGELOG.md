@@ -1,6 +1,6 @@
 # v0.2
 
-No changes yet.
+* Improved pretty-printing of strings.
 
 # v0.1
 

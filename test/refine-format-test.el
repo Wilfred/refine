@@ -15,6 +15,11 @@
 (ert-deftest refine-format-string ()
   (should (equal (refine--pretty-format "abc\"def") "\"abc\\\"def\"")))
 
+(ert-deftest refine-format-multiline-string ()
+  "When formatting multiline strings, we should indent subsequent lines.
+This ensures that vertical text lines up (the \" adds an offset)."
+  (should (equal (refine--pretty-format "abc\ndef") "\"abc\n def\"")))
+
 (ert-deftest refine-format-dotted-list ()
   (should (equal (refine--pretty-format (cons 1 2)) "'(1 . 2)")))
 

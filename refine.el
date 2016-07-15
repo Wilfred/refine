@@ -50,10 +50,16 @@
                         (cl-prettyprint value)
                         (s-trim (buffer-string)))))
     (cond ((stringp value)
-           ;; Don't use cl-prettyprint for strings, as we want to see
-           ;; fontified text, not escaped literals like
-           ;; #("f" 0 1 (face font-lock-keyword-face))
-           (format "\"%s\"" (s-replace "\"" "\\\"" value)))
+           ;; We want propertized text, shown with the double-quotes,
+           ;; and subsequent lines indented so they line up under the ".
+           (let* ((escaped-quotes (s-replace "\"" "\\\"" value))
+                  (lines (s-lines escaped-quotes))
+                  (indented-lines (--map-indexed
+                                   (if (zerop it-index)
+                                       it
+                                     (format " %s" it))
+                                   lines)))
+             (format "\"%s\"" (s-join "\n" indented-lines))))
           ;; Print nil and t as-is.'
           ((or (eq t value) (eq nil value))
            (format "%s" value))
