@@ -12,5 +12,10 @@
 (let ((refine-dir (f-parent (f-dirname (f-this-file)))))
   (add-to-list 'load-path refine-dir))
 
+(require 'undercover)
+(undercover "refine.el"
+	    (:exclude "*-test.el")
+	    (:report-file "/tmp/undercover-report.json"))
+
 (provide 'test-helper)
 ;;; test-helper.el ends here
