@@ -8,7 +8,7 @@
 ;; Author: Wilfred Hughes <me@wilfred.me.uk>
 ;; Version: 0.2
 ;; Keywords: convenience
-;; Package-Requires: ((s "1.11.0") (dash "2.12.0") (list-utils "0.4.4") (magit-popup "2.7.0"))
+;; Package-Requires: ((emacs "24.3") (s "1.11.0") (dash "2.12.0") (list-utils "0.4.4") (magit-popup "2.7.0"))
 
 ;; This program is free software; you can redistribute it and/or modify
 ;; it under the terms of the GNU General Public License as published by
