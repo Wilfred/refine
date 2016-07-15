@@ -441,11 +441,10 @@ With a numeric prefix, move that many items."
                          type-description))))
 
 ;;;###autoload
-(defun refine ()
+(defun refine (symbol)
   "Interactively edit the value of a symbol \(usually a list\)."
-  (interactive)
-  (let* ((symbol (read (completing-read "Variable: " (refine--variables))))
-         (buf (refine--buffer symbol)))
+  (interactive (list (read (completing-read "Variable: " (refine--variables)))))
+  (let* ((buf (refine--buffer symbol)))
     (refine--update buf symbol)
     (switch-to-buffer buf)))
 
