@@ -1,9 +1,12 @@
 (require 'ert)
 (require 'refine)
 
-(ert-deftest refine-auto-mode-alist ()
+(ert-deftest refine-smoke-test ()
   "Smoke test to ensure that we can show a complex list."
-  (refine 'auto-mode-alist))
+  (refine 'auto-mode-alist)
+  (refine-update)
+  (refine-next 1)
+  (refine-previous 1))
 
 (ert-deftest refine-variables-not-functions ()
   (let ((vars (refine--variables)))
