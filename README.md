@@ -24,6 +24,34 @@ such as `font-lock-defaults`.
 In some cases, this isn't possible (e.g. inserting into an empty
 list). In these cases, refine will overwrite your variable.
 
+## Keybindings
+
+Editing:
+
+|  command               | binding           |
+|------------------------|-------------------|
+| `refine-edit`          | <kbd>e</kbd>      |
+| `refine-insert`        | <kbd>i</kbd>      |
+| `refine-insert-after`  | <kbd>a</kbd>      |
+| `refine-delete`        | <kbd>k</kbd>      |
+| `refine-move-forward`  | <kbd>s</kbd> or <kbd>&lt;M-up&gt;</kbd>   |
+| `refine-move-backward` | <kbd>w</kbd> or <kbd>&lt;M-down&gt;</kbd> |
+
+Moving around:
+
+|  command               | binding           |
+|------------------------|-------------------|
+| `refine-next`          | <kbd>n</kbd>      |
+| `refine-previous`      | <kbd>p</kbd>      |
+
+Buffer commands:
+
+|  command               | binding           |
+|------------------------|-------------------|
+| `refine-update`        | <kbd>g</kbd>      |
+| `kill-this-buffer`     | <kbd>k</kbd>      |
+
+
 ## License
 
 GPLv3.
