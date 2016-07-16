@@ -53,7 +53,7 @@ Buffer commands:
 |  command               | binding           |
 |------------------------|-------------------|
 | `refine-update`        | <kbd>g</kbd>      |
-| `kill-this-buffer`     | <kbd>k</kbd>      |
+| `kill-this-buffer`     | <kbd>q</kbd>      |
 
 
 ## License
