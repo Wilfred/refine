@@ -400,7 +400,7 @@ With a numeric prefix, move that many items."
   (assert (symbolp symbol))
   (let ((buffer (get-buffer-create (format "*refine: %s*" symbol))))
     (with-current-buffer buffer
-      ;; Need to set the major mode before we local variables.
+      ;; Need to set the major mode before we set local variables.
       (refine-mode)
       (setq-local refine--symbol symbol))
     buffer))
