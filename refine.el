@@ -448,14 +448,8 @@ With a numeric prefix, move that many items."
     (refine--update buf symbol)
     (switch-to-buffer buf)))
 
-(defvar refine-mode-syntax-table
-  (let ((table (make-syntax-table)))
-    (modify-syntax-entry ?\" "\"" table)
-    table))
-
 (define-derived-mode refine-mode fundamental-mode "Refine"
   "A major mode for interactively editing elisp values."
-  :syntax-table refine-mode-syntax-table
   (setq buffer-read-only t))
 
 (magit-define-popup refine-popup
