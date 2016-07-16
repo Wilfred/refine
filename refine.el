@@ -378,6 +378,7 @@ If DISTANCE is negative, move backwards."
    (let* ((lst (refine--eval refine--symbol))
           (current-value (nth (refine--index-at-point) lst)))
      (list (read--expression "New value: " (refine--pretty-format current-value)))))
+  ;; TODO: is there a nicer way of doing this?
   (eval
    `(setf (nth ,(refine--index-at-point) ,refine--symbol) ,new-value))
   (refine-update))
