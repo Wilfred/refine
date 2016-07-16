@@ -31,9 +31,10 @@
 
 (require 's)
 (require 'dash)
+(require 'cl-lib) ;; cl-prettyprint, cl-incf, cl-decf
 (require 'list-utils)
 (eval-when-compile
-  (require 'cl)
+  (require 'cl-macs) ;; cl-assert
   (require 'magit-popup))
 
 (defun refine--variables ()
@@ -338,11 +339,11 @@ If DISTANCE is too big, move it as far as possible."
           ;; Moving forwards
           (progn
             (refine--swap index (1+ index))
-            (incf index))
+            (cl-incf index))
         ;; Moving backwards
         (progn
           (refine--swap index (1- index))
-          (decf index))))))
+          (cl-decf index))))))
 
 (defun refine--move (distance)
   "Move point DISTANCE items forward.
