@@ -8,7 +8,7 @@
 ;; Author: Wilfred Hughes <me@wilfred.me.uk>
 ;; Version: 0.2
 ;; Keywords: convenience
-;; Package-Requires: ((emacs "24.3") (s "1.11.0") (dash "2.12.0") (list-utils "0.4.4") (magit-popup "2.7.0"))
+;; Package-Requires: ((emacs "24.3") (s "1.11.0") (dash "2.12.0") (list-utils "0.4.4"))
 
 ;; This program is free software; you can redistribute it and/or modify
 ;; it under the terms of the GNU General Public License as published by
@@ -454,13 +454,7 @@ With a numeric prefix, move that many items."
   "A major mode for interactively editing elisp values."
   (setq buffer-read-only t))
 
-(magit-define-popup refine-popup
-  "Popup console for changing items in a list."
-  :actions '((?g "Reload" refine-update)
-             (?d "Delete" refine-delete)))
-
-;; TODO: get this popup working.
-;; (define-key refine-mode-map (kbd "?") #'refine-popup)
+;; TODO: add a magit-style popup.
 
 ;; Buffer-level operations.
 (define-key refine-mode-map (kbd "q") #'kill-this-buffer)
