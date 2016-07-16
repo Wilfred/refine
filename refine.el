@@ -34,8 +34,7 @@
 (require 'cl-lib) ;; cl-prettyprint, cl-incf, cl-decf
 (require 'list-utils)
 (eval-when-compile
-  (require 'cl-macs) ;; cl-assert
-  (require 'magit-popup))
+  (require 'cl-macs)) ;; cl-assert
 
 (defun refine--variables ()
   "Return a list of all symbols that are variables."
