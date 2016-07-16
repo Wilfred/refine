@@ -1,6 +1,8 @@
 # Refine
 [![Build Status](https://travis-ci.org/Wilfred/refine.svg?branch=master)](https://travis-ci.org/Wilfred/refine)
 [![Coverage Status](https://coveralls.io/repos/github/Wilfred/refine/badge.svg?branch=master)](https://coveralls.io/github/Wilfred/refine?branch=master)
+[![MELPA](http://melpa.org/packages/refine-badge.svg)](http://melpa.org/#/refine)
+[![MELPA Stable](http://stable.melpa.org/packages/refine-badge.svg)](http://stable.melpa.org/#/refine)
 
 ***finally, an editor for Emacs!***
 
@@ -59,4 +61,4 @@ GPLv3.
 
 ## Installation
 
-Add refine.el to `load-path`. MELPA [in progress](https://github.com/melpa/melpa/pull/4046).
+Install from MELPA (recommended), or add refine.el to `load-path`.
