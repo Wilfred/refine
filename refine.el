@@ -70,10 +70,6 @@
           (t
            cl-formatted))))
 
-(defun refine--eval (symbol)
-  "Return the value of SYMBOL."
-  (eval symbol t))
-
 (defface refine-index-face
   '((((class color) (background light))
      :foreground "grey50")
@@ -146,7 +142,7 @@ string listing the elements."
 (defun refine--update (buffer symbol)
   "Update BUFFER with the current value of SYMBOL."
   (with-current-buffer buffer
-    (let* ((value (refine--eval symbol))
+    (let* ((value (symbol-value symbol))
            (pos (point))
            buffer-read-only)
       (erase-buffer)
@@ -194,7 +190,7 @@ This mutates the list.
 If SYMBOL is nil, assigns to SYMBOL instead."
   (interactive)
   (assert (symbolp symbol))
-  (let* ((list (refine--eval symbol))
+  (let* ((list (symbol-value symbol))
          (length (safe-length list)))
     ;; `symbol' must be a list that's long enough.
     (assert (and (consp list) (>= length index)))
@@ -210,7 +206,7 @@ If SYMBOL is nil, assigns to SYMBOL instead."
 
 This creates a new vector and assigns it to SYMBOL. Vectors have
 fixed length, see *info* (elisp) Arrays."
-  (let* ((vector (refine--eval symbol))
+  (let* ((vector (symbol-value symbol))
          (length (length vector)))
     (assert (and (vectorp vector) (< index length)))
 
@@ -244,7 +240,7 @@ This mutates the list."
 (defun refine--pop (symbol index)
   "Remote the item at INDEX in vectory/list variable SYMBOL.
 Mutates the value where possible."
-  (let ((value (refine--eval symbol)))
+  (let ((value (symbol-value symbol)))
     (cond ((vectorp value)
            (refine--vector-pop symbol index))
           ((equal (length value) 1)
@@ -301,7 +297,7 @@ Equivalent to interactive \"X\"."
 
 (defun refine--swap (index1 index2)
   "Switch the items at INDEX1 and INDEX2 in the current list."
-  (let* ((value (refine--eval refine--symbol))
+  (let* ((value (symbol-value refine--symbol))
          (index1-element (nth index1 value))
          (index2-element (nth index2 value)))
     (setf (nth index2 value) index1-element)
@@ -329,7 +325,7 @@ When called with a prefix, move that many positions."
 (defun refine--move-element (index distance)
   "Move the element at INDEX by DISTANCE positions.
 If DISTANCE is too big, move it as far as possible."
-  (let* ((value (refine--eval refine--symbol))
+  (let* ((value (symbol-value refine--symbol))
          (target-index-raw (+ index distance))
          ;; Ensure 0 <= target-index <= length - 1
          (target-index (max (min target-index-raw (1- (length value))) 0)))
@@ -352,7 +348,7 @@ If DISTANCE is negative, move backwards."
          (requested-index (+ current-index distance))
          ;; Ensure we don't try to go outside the range allowed for
          ;; this list.
-         (value (refine--eval refine--symbol))
+         (value (symbol-value refine--symbol))
          (target-index (max 0 (min requested-index (1- (safe-length value))))))
     (beginning-of-line)
     (if (> distance 0)
@@ -375,7 +371,7 @@ If DISTANCE is negative, move backwards."
 (defun refine-edit (new-value)
   "Edit the current item in the list."
   (interactive
-   (let* ((lst (refine--eval refine--symbol))
+   (let* ((lst (symbol-value refine--symbol))
           (index (refine--index-at-point))
           (current-value (nth index lst))
           (prompt (format "Set value at %s: " index)))
