@@ -1,7 +1,6 @@
 ;;; refine.el --- interactive value editing         -*- lexical-binding: t; -*-
 
 ;; TODO: prompt the user to choose between local and global variables
-;; TODO: hook into customize when users are choosing new values.
 
 ;; Copyright (C) 2016  
 
@@ -43,6 +42,18 @@
                 (when (boundp symbol)
                   (push symbol symbols))))
     symbols))
+
+(defun refine--possible-elements (symbol)
+  "Return a list of the possible list elements SYMBOL can have.
+Returns nil if SYMBOL is not a custom variable."
+  (when (custom-variable-p symbol)
+    ;; If custom-type takes the form '(repeat (choice (...)))
+    (-let [(repeat-sym (choice-sym . choices)) (get symbol 'custom-type)]
+      (when (and (eq repeat-sym 'repeat) (eq choice-sym 'choice))
+        ;; (const :tag "Cider" cider) => 'cider
+        (->> choices
+             (--filter (eq (-first-item it) 'const))
+             (-map #'-last-item))))))
 
 (defun refine--pretty-format (value)
   "Pretty print VALUE as a string."
@@ -262,6 +273,13 @@ Mutates the value where possible."
 Equivalent to interactive \"X\"."
   (eval (read--expression prompt initial-contents)))
 
+(defun refine--read-element (symbol prompt &optional initial-contents)
+  "Read a new value for a list element of SYMBOL."
+  (let ((possibilities (refine--possible-elements symbol)))
+    (if possibilities
+        (eval (read (completing-read prompt (-map #'refine--pretty-format possibilities))))
+      (refine--read-eval-expr prompt initial-contents))))
+
 (defun refine-delete ()
   "Remove the current list item at point."
   (interactive)
@@ -275,7 +293,8 @@ Equivalent to interactive \"X\"."
   (interactive
    (let ((index (refine--index-at-point)))
      (if index
-         (list (refine--read-eval-expr
+         (list (refine--read-element
+                refine--symbol
                 (format "Value to insert at %s: " (refine--index-at-point))))
        (user-error "No value here"))))
   (-when-let (list-index (refine--index-at-point))
@@ -373,12 +392,11 @@ If DISTANCE is negative, move backwards."
   (interactive
    (let* ((lst (symbol-value refine--symbol))
           (index (refine--index-at-point))
-          (current-value (nth index lst))
-          (prompt (format "Set value at %s: " index)))
-     (list (read--expression prompt (refine--pretty-format current-value)))))
-  ;; TODO: is there a nicer way of doing this?
-  (eval
-   `(setf (nth ,(refine--index-at-point) ,refine--symbol) ,new-value))
+          (prompt (format "Set value at %s: " index))
+          (current-value (nth index lst)))
+     (list (refine--read-element refine--symbol prompt
+                                 (refine--pretty-format current-value)))))
+  (setf (nth (refine--index-at-point) (symbol-value refine--symbol)) new-value)
   (refine-update))
 
 (defun refine-next (arg)
