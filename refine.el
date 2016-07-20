@@ -303,9 +303,8 @@ Equivalent to interactive \"X\"."
                 (format "Value to insert at %s: "
                         (if (numberp index) index 0))))
        (user-error "No value here"))))
-  (-when-let (list-index (refine--index-at-point))
-    (refine--insert refine--symbol list-index value)
-    (refine-update)))
+  (refine--insert refine--symbol (refine--index-at-point) value)
+  (refine-update))
 
 (defun refine-insert-after (value)
   "Insert a new item before the list item at point."
