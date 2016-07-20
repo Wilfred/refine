@@ -118,6 +118,8 @@ return a pretty, propertized string."
     (refine--prefix-lines
      (concat propertized-index " ") formatted-element)))
 
+;; TODO: rename this function. format-element, format-value and
+;; pretty-format is confusing.
 (defun refine--format-value (value)
   "Given a list or vector VALUE, return a pretty propertized
 string listing the elements."
