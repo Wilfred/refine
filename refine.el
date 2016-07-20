@@ -142,7 +142,7 @@ string listing the elements."
             (if (null value) 0 (ceiling (log (safe-length value) 10))))
            ;; If there are 10 or more items, make sure we print the
            ;; index with a width of 2, and so on.
-           (index-format-string (concat "%" (format "%s" index-digits-required) "d "))
+           (index-format-string (concat "%" (format "%s" index-digits-required) "d"))
            ;; Pretty-print each element, along with an index.
            (formatted-elements
             (--map-indexed
