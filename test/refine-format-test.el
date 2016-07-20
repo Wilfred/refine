@@ -12,6 +12,11 @@
   "We should show a sensible value for an empty list."
   (should (equal (refine--format-value nil) "nil")))
 
+(ert-deftest refine-format-value-string ()
+  "Refine isn't very useful for strings, but we should show
+something sensible."
+  (should (equal (refine--format-value "foo") "\"foo\"")))
+
 (ert-deftest refine-format-string ()
   (should (equal (refine--pretty-format "abc\"def") "\"abc\\\"def\"")))
 

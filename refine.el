@@ -122,6 +122,8 @@ return a pretty, propertized string."
   "Given a list or vector VALUE, return a pretty propertized
 string listing the elements."
   (cond
+   ((stringp value)
+    (refine--pretty-format value))
    ((vectorp value)
     (refine--format-value (refine--vector->list value)))
 
