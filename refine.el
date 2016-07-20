@@ -208,14 +208,14 @@ If SYMBOL is nil, assigns to SYMBOL instead."
   (assert (symbolp symbol))
   (let* ((list (symbol-value symbol))
          (length (safe-length list)))
-    ;; `symbol' must be a list that's long enough.
-    (assert (and (consp list) (>= length index)))
-
+    (assert (or (consp list) (null list)))
     (cond
      ;; If list is nil, we can't modify destructively.
      ((= length 0) (set symbol (list value)))
 
-     (t (refine--insert-list list index value)))))
+     (t
+      (assert (>= length index))
+      (refine--insert-list list index value)))))
 
 (defun refine--vector-pop (symbol index)
   "Remove the item at INDEX from vector variable SYMBOL.
@@ -300,7 +300,8 @@ Equivalent to interactive \"X\"."
      (if index
          (list (refine--read-element
                 refine--symbol
-                (format "Value to insert at %s: " (refine--index-at-point))))
+                (format "Value to insert at %s: "
+                        (if (numberp index) index 0))))
        (user-error "No value here"))))
   (-when-let (list-index (refine--index-at-point))
     (refine--insert refine--symbol list-index value)

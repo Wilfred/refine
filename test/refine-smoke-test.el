@@ -8,6 +8,20 @@
   (refine-next 1)
   (refine-previous 1))
 
+(defvar refine--test-var)
+
+(ert-deftest refine-insert-empty-list ()
+  "Smoke test to ensure that we can insert into an empty list."
+  ;; Open refine on an empty list.
+  (setq refine--test-var nil)
+  (refine 'refine--test-var)
+  ;; Move to the list itself.
+  (refine-next 1)
+  (refine-insert 'a)
+  ;; Verify that we inserted the value we expected.
+  (should (equal refine--test-var
+                 (list 'a))))
+
 (ert-deftest refine-variables-not-functions ()
   (let ((vars (refine--variables)))
     (should (-contains-p vars 'kill-ring))
