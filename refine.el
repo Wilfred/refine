@@ -7,7 +7,7 @@
 ;; Author: Wilfred Hughes <me@wilfred.me.uk>
 ;; Version: 0.2
 ;; Keywords: convenience
-;; Package-Requires: ((emacs "24.3") (s "1.11.0") (dash "2.12.0") (list-utils "0.4.4"))
+;; Package-Requires: ((emacs "24.3") (s "1.11.0") (dash "2.12.0") (list-utils "0.4.4") (loop "1.2"))
 
 ;; This program is free software; you can redistribute it and/or modify
 ;; it under the terms of the GNU General Public License as published by
@@ -32,6 +32,7 @@
 (require 'dash)
 (require 'cl-lib) ;; cl-prettyprint, cl-incf, cl-decf
 (require 'list-utils)
+(require 'loop)
 (eval-when-compile
   (require 'cl-macs)) ;; cl-assert
 
@@ -303,8 +304,12 @@ Equivalent to interactive \"X\"."
                 (format "Value to insert at %s: "
                         (if (numberp index) index 0))))
        (user-error "No value here"))))
-  (refine--insert refine--symbol (refine--index-at-point) value)
-  (refine-update))
+  (let ((index (refine--index-at-point)))
+    (unless (numberp index)
+      (setq index 0))
+    (refine--insert refine--symbol index value)
+    (refine-update)
+    (refine--goto index)))
 
 (defun refine-insert-after (value)
   "Insert a new item before the list item at point."
@@ -425,6 +430,14 @@ With a numeric prefix, move that many items."
 With a numeric prefix, move that many items."
   (interactive "p")
   (refine--move (- arg)))
+
+;; TODO: can we write refine--move in terms of refine--goto?
+(defun refine--goto (index)
+  "Move point to list INDEX requested."
+  (goto-char (point-min))
+  (loop-until (or (eq (refine--index-at-point) 'empty)
+                  (equal (refine--index-at-point) index))
+    (forward-line 1)))
 
 (defun refine--buffer (symbol)
   "Get or create a refine buffer for SYMBOL."

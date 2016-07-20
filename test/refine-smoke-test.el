@@ -20,7 +20,9 @@
   (refine-insert 'a)
   ;; Verify that we inserted the value we expected.
   (should (equal refine--test-var
-                 (list 'a))))
+                 (list 'a)))
+  ;; We should have point positioned on the newly inserted item.
+  (should (looking-at "0 'a")))
 
 (ert-deftest refine-variables-not-functions ()
   (let ((vars (refine--variables)))
