@@ -10,7 +10,10 @@
 
 (ert-deftest refine-format-value-empty-list ()
   "We should show a sensible value for an empty list."
-  (should (equal (refine--format-value nil) "nil")))
+  (should
+   (equal-including-properties
+    (refine--format-value nil)
+    (propertize "nil" 'refine-index 'empty))))
 
 (ert-deftest refine-format-value-string ()
   "Refine isn't very useful for strings, but we should show

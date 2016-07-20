@@ -129,7 +129,8 @@ string listing the elements."
    ((vectorp value)
     (refine--format-value (refine--vector->list value)))
 
-   ((null value) "nil")
+   ((null value)
+    (propertize "nil" 'refine-index 'empty))
 
    ((refine--dotted-pair-p value)
     (format "%s\n%s"
@@ -366,42 +367,52 @@ If DISTANCE is too big, move it as far as possible."
 (defun refine--move (distance)
   "Move point DISTANCE items forward.
 If DISTANCE is negative, move backwards."
-  (let* ( ;; Work out which list index to go to.
-         (current-index (or (refine--index-at-point) -1))
-         (requested-index (+ current-index distance))
-         ;; Ensure we don't try to go outside the range allowed for
-         ;; this list.
-         (value (symbol-value refine--symbol))
-         (target-index (max 0 (min requested-index (1- (safe-length value))))))
-    (beginning-of-line)
-    (if (> distance 0)
-        ;; Go forwards until we're on the first line of the requested value.
-        (while (or (null (refine--index-at-point))
-                   (< (refine--index-at-point) target-index))
-          (forward-line 1))
-      ;; Go backwards until we're on the first line of the requested
-      ;; value, even if it has multiple lines.
-      (progn
-        ;; Go to last line of the target value.
-        (while (not (equal (refine--index-at-point) target-index))
-          (forward-line -1))
-        ;; Go past the target value.
-        (while (equal (refine--index-at-point) target-index)
-          (forward-line -1))
-        ;; Move back to the first line of this value.
-        (forward-line 1)))))
+  (let* ((value (symbol-value refine--symbol))
+         (length (safe-length value)))
+    ;; If we're dealing with the empty list, just move to the line
+    ;; where it's shown.
+    (if (equal length 0)
+        (progn
+          (goto-char (point-min))
+          (while (not (equal (refine--index-at-point) 'empty))
+            (forward-line 1)))
+      ;; Otherwise, we have a non-empty list.
+      (let* ( ;; Work out which list index to go to.
+             (current-index (or (refine--index-at-point) -1))
+             (requested-index (+ current-index distance))
+             ;; Ensure we don't try to go outside the range allowed for
+             ;; this list.
+             (target-index (max 0 (min requested-index (1- length)))))
+        (beginning-of-line)
+        (if (> distance 0)
+            ;; Go forwards until we're on the first line of the requested value.
+            (while (or (null (refine--index-at-point))
+                       (and (numberp (refine--index-at-point))
+                            (< (refine--index-at-point) target-index)))
+              (forward-line 1))
+          ;; Go backwards until we're on the first line of the requested
+          ;; value, even if it has multiple lines.
+          (progn
+            ;; Go to last line of the target value.
+            (while (or (not (equal (refine--index-at-point) target-index)))
+              (forward-line -1))
+            ;; Go past the target value.
+            (while (equal (refine--index-at-point) target-index)
+              (forward-line -1))
+            ;; Move back to the first line of this value.
+            (forward-line 1))))))
 
-(defun refine-edit (new-value)
-  "Edit the current item in the list."
-  (interactive
-   (let* ((lst (symbol-value refine--symbol))
-          (index (refine--index-at-point))
-          (prompt (format "Set value at %s: " index))
-          (current-value (nth index lst)))
-     (list (refine--read-element refine--symbol prompt
-                                 (refine--pretty-format current-value)))))
-  (setf (nth (refine--index-at-point) (symbol-value refine--symbol)) new-value)
-  (refine-update))
+  (defun refine-edit (new-value)
+    "Edit the current item in the list."
+    (interactive
+     (let* ((lst (symbol-value refine--symbol))
+            (index (refine--index-at-point))
+            (prompt (format "Set value at %s: " index))
+            (current-value (nth index lst)))
+       (list (refine--read-element refine--symbol prompt
+                                   (refine--pretty-format current-value)))))
+    (setf (nth (refine--index-at-point) (symbol-value refine--symbol)) new-value)
+    (refine-update)))
 
 (defun refine-next (arg)
   "Move point to the next item.
