@@ -504,6 +504,7 @@ With a numeric prefix, move that many items."
 
 ;; Modifying the list.
 (define-key refine-mode-map (kbd "e") #'refine-edit)
+(define-key refine-mode-map (kbd "RET") #'refine-edit)
 (define-key refine-mode-map (kbd "k") #'refine-delete)
 (define-key refine-mode-map (kbd "a") #'refine-insert-after)
 (define-key refine-mode-map (kbd "i") #'refine-insert)
