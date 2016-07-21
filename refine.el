@@ -358,7 +358,7 @@ If DISTANCE is too big, move it as far as possible."
          (target-index-raw (+ index distance))
          ;; Ensure 0 <= target-index <= length - 1
          (target-index (max (min target-index-raw (1- (length value))) 0)))
-    (while (not (equal index target-index))
+    (loop-until (equal index target-index)
       (if (> distance 0)
           ;; Moving forwards
           (progn
@@ -379,7 +379,7 @@ If DISTANCE is negative, move backwards."
     (if (equal length 0)
         (progn
           (goto-char (point-min))
-          (while (not (equal (refine--index-at-point) 'empty))
+          (loop-until (equal (refine--index-at-point) 'empty)
             (forward-line 1)))
       ;; Otherwise, we have a non-empty list.
       (let* ( ;; Work out which list index to go to.
@@ -391,15 +391,14 @@ If DISTANCE is negative, move backwards."
         (beginning-of-line)
         (if (> distance 0)
             ;; Go forwards until we're on the first line of the requested value.
-            (while (or (null (refine--index-at-point))
-                       (and (numberp (refine--index-at-point))
-                            (< (refine--index-at-point) target-index)))
+            (loop-until (or (eq (refine--index-at-point) 'empty)
+                            (equal (refine--index-at-point) target-index))
               (forward-line 1))
           ;; Go backwards until we're on the first line of the requested
           ;; value, even if it has multiple lines.
           (progn
             ;; Go to last line of the target value.
-            (while (or (not (equal (refine--index-at-point) target-index)))
+            (loop-until (equal (refine--index-at-point) target-index)
               (forward-line -1))
             ;; Go past the target value.
             (while (equal (refine--index-at-point) target-index)
