@@ -9,6 +9,21 @@
 Refine provides a convenient UI for editing lists. Refine is not for
 editing files, but for changing elisp variables that are set to lists.
 
+<!-- markdown-toc start - Don't edit this section. Run M-x markdown-toc-generate-toc again -->
+**Table of Contents**
+
+- [Refine](#refine)
+    - [Usage examples](#usage-examples)
+    - [Limitations](#limitations)
+    - [Keybindings](#keybindings)
+    - [License](#license)
+    - [Installation](#installation)
+    - [Tests](#tests)
+
+<!-- markdown-toc end -->
+
+## Usage examples
+
 ![edit_hook](edit_hook.gif)
 
 Refine is great for editing large lists, such as hooks. In the above
