@@ -22,6 +22,15 @@ description changes."
     ;; Point should still be on the same line.
     (should (equal start-line (line-number-at-pos)))))
 
+(ert-deftest refine-next-symbol-value ()
+  "`refine-update' should not move point, even if the value
+description changes."
+  (setq refine--test-var 'foo)
+  (refine 'refine--test-var)
+  ;; Move point to the value.
+  ;; Warning: when this is broken, it's often an infinite loop!
+  (refine-next 1))
+
 (ert-deftest refine-insert-empty-list ()
   "Smoke test to ensure that we can insert into an empty list."
   ;; Open refine on an empty list.

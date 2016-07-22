@@ -391,14 +391,13 @@ If DISTANCE is too big, move it as far as possible."
 (defun refine--move (distance)
   "Move point DISTANCE items forward.
 If DISTANCE is negative, move backwards."
-  (let* ((value (symbol-value refine--symbol))
-         (length (safe-length value)))
-    ;; If we're dealing with the empty list, just move to the line
-    ;; where it's shown.
-    (if (equal length 0)
+  (let* ((value (symbol-value refine--symbol)))
+    ;; If we're dealing with a scalar or the empty list, just move to
+    ;; the line where it's shown.
+    (if (not (consp value))
         (progn
           (goto-char (point-min))
-          (loop-until (equal (refine--index-at-point) 'empty)
+          (loop-until (not (null (refine--index-at-point)))
             (forward-line 1)))
       ;; Otherwise, we have a non-empty list.
       (let* ( ;; Work out which list index to go to.
@@ -406,6 +405,7 @@ If DISTANCE is negative, move backwards."
              (requested-index (+ current-index distance))
              ;; Ensure we don't try to go outside the range allowed for
              ;; this list.
+             (length (safe-length value))
              (target-index (max 0 (min requested-index (1- length)))))
         (beginning-of-line)
         (if (> distance 0)
