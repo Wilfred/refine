@@ -34,3 +34,10 @@
     (should (eq test-list original))
     ;; The tails should also be the same cons cell.
     (should (eq (last test-list) (last original)))))
+
+(ert-deftest refine-move-element ()
+  (let ((my-list '(a b c d e)))
+    ;; Move 'b two positions forward.
+    (refine--move-element my-list 1 2)
+    (should
+     (equal my-list '(a c d b e)))))

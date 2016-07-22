@@ -343,10 +343,9 @@ Equivalent to interactive \"X\"."
     (refine-update))
   (refine-next 1))
 
-(defun refine--swap (index1 index2)
-  "Switch the items at INDEX1 and INDEX2 in the current list."
-  (let* ((value (symbol-value refine--symbol))
-         (index1-element (nth index1 value))
+(defun refine--swap (value index1 index2)
+  "Switch the items at INDEX1 and INDEX2 in list VALUE."
+  (let* ((index1-element (nth index1 value))
          (index2-element (nth index2 value)))
     (setf (nth index2 value) index1-element)
     (setf (nth index1 value) index2-element)))
@@ -368,24 +367,22 @@ When called with a prefix, move that many positions."
   (refine-move-forward (- arg)))
 
 ;; TODO: extract all these internal manipulation functions to a
-;; separate package. Each function should take a symbol rather than
-;; implicitly using `refine--symbol'.
-(defun refine--move-element (index distance)
-  "Move the element at INDEX by DISTANCE positions.
+;; separate package.
+(defun refine--move-element (value index distance)
+  "Move the element at INDEX by DISTANCE positions in list VALUE.
 If DISTANCE is too big, move it as far as possible."
-  (let* ((value (symbol-value refine--symbol))
-         (target-index-raw (+ index distance))
+  (let* ((target-index-raw (+ index distance))
          ;; Ensure 0 <= target-index <= length - 1
          (target-index (max (min target-index-raw (1- (length value))) 0)))
     (loop-until (equal index target-index)
       (if (> distance 0)
           ;; Moving forwards
           (progn
-            (refine--swap index (1+ index))
+            (refine--swap value index (1+ index))
             (cl-incf index))
         ;; Moving backwards
         (progn
-          (refine--swap index (1- index))
+          (refine--swap value index (1- index))
           (cl-decf index))))))
 
 (defun refine--move-point (distance)
