@@ -388,7 +388,7 @@ If DISTANCE is too big, move it as far as possible."
           (refine--swap index (1- index))
           (cl-decf index))))))
 
-(defun refine--move (distance)
+(defun refine--move-point (distance)
   "Move point DISTANCE items forward.
 If DISTANCE is negative, move backwards."
   (let* ((value (symbol-value refine--symbol)))
@@ -443,15 +443,15 @@ If DISTANCE is negative, move backwards."
   "Move point to the next item.
 With a numeric prefix, move that many items."
   (interactive "p")
-  (refine--move arg))
+  (refine--move-point arg))
 
 (defun refine-previous (arg)
   "Move point to the previous item.
 With a numeric prefix, move that many items."
   (interactive "p")
-  (refine--move (- arg)))
+  (refine--move-point (- arg)))
 
-;; TODO: can we write refine--move in terms of refine--goto?
+;; TODO: can we write refine--move-point in terms of refine--goto?
 (defun refine--goto (index)
   "Move point to list INDEX requested."
   (goto-char (point-min))
