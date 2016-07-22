@@ -162,12 +162,17 @@ string listing the elements."
   "Update BUFFER with the current value of SYMBOL."
   (with-current-buffer buffer
     (let* ((value (symbol-value symbol))
-           (pos (point))
+           (current-line (line-number-at-pos))
+           (current-column (current-column))
            buffer-read-only)
       (erase-buffer)
       (insert (format "%s:\n\n" (refine--describe symbol value)))
       (insert (refine--format-value value))
-      (goto-char pos))))
+      ;; We can't use `save-excursion' because we erased the whole
+      ;; buffer. Go back to the previous position.
+      (goto-char (point-min))
+      (forward-line (1- current-line))
+      (forward-char current-column))))
 
 (defvar-local refine--symbol nil
   "The symbol being inspected in the current buffer.")

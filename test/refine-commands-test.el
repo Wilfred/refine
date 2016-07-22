@@ -3,12 +3,24 @@
 
 (ert-deftest refine-smoke-test ()
   "Smoke test to ensure that we can show a complex list."
-  (refine 'auto-mode-alist)
-  (refine-update)
-  (refine-next 1)
-  (refine-previous 1))
+  (refine 'auto-mode-alist))
 
 (defvar refine--test-var)
+
+(ert-deftest refine-update-preserves-position ()
+  "`refine-update' should not move point, even if the value
+description changes."
+  ;; First, show a refine buffer on a nil value.
+  (setq refine--test-var nil)
+  (refine 'refine--test-var)
+  ;; Move point to the value.
+  (refine-next 1)
+  (let ((start-line (line-number-at-pos)))
+    ;; Set the variable to a list, and update.
+    (setq refine--test-var '(1 2 3 4))
+    (refine-update)
+    ;; Point should still be on the same line.
+    (should (equal start-line (line-number-at-pos)))))
 
 (ert-deftest refine-insert-empty-list ()
   "Smoke test to ensure that we can insert into an empty list."
