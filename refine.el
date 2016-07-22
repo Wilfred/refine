@@ -131,9 +131,7 @@ return a pretty, propertized string."
     (refine--prefix-lines
      (concat propertized-index " ") formatted-element)))
 
-;; TODO: rename this function. format-element, format-value and
-;; pretty-format is confusing.
-(defun refine--format-value (value)
+(defun refine--format-with-index (value)
   "Given an elisp VALUE, return a pretty propertized
 string listing the elements.
 
@@ -142,7 +140,7 @@ VALUE may be a list, string, vector or symbol."
    ((stringp value)
     (propertize (refine--pretty-format value) 'refine-index 'scalar))
    ((vectorp value)
-    (refine--format-value (refine--vector->list value)))
+    (refine--format-with-index (refine--vector->list value)))
 
    ((null value)
     (propertize "nil" 'refine-index 'empty))
@@ -181,7 +179,7 @@ VALUE may be a list, string, vector or symbol."
            buffer-read-only)
       (erase-buffer)
       (insert (format "%s:\n\n" (refine--describe symbol value)))
-      (insert (refine--format-value value))
+      (insert (refine--format-with-index value))
       ;; We can't use `save-excursion' because we erased the whole
       ;; buffer. Go back to the previous position.
       (goto-char (point-min))

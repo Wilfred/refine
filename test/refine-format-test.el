@@ -12,19 +12,19 @@
   "We should show a sensible value for an empty list."
   (should
    (equal-including-properties
-    (refine--format-value nil)
+    (refine--format-with-index nil)
     (propertize "nil" 'refine-index 'empty))))
 
 (ert-deftest refine-format-value-t ()
   "We should be able to show 't."
   (should
-   (equal (refine--format-value t) "t")))
+   (equal (refine--format-with-index t) "t")))
 
 (ert-deftest refine-format-value-symbols ()
   "We should be able to format arbitrary symbols."
   (should
    (equal-including-properties
-    (refine--format-value 'foo)
+    (refine--format-with-index 'foo)
     (propertize "'foo" 'refine-index 'scalar))))
 
 (ert-deftest refine-format-value-string ()
@@ -32,7 +32,7 @@
 something sensible."
   (should
    (equal-including-properties
-    (refine--format-value "foo")
+    (refine--format-with-index "foo")
     (propertize "\"foo\"" 'refine-index 'scalar))))
 
 (ert-deftest refine-format-string ()
