@@ -132,6 +132,8 @@ string listing the elements."
 
    ((null value)
     (propertize "nil" 'refine-index 'empty))
+   ((eq value t)
+    "t")
 
    ((refine--dotted-pair-p value)
     (format "%s\n%s"

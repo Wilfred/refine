@@ -15,6 +15,11 @@
     (refine--format-value nil)
     (propertize "nil" 'refine-index 'empty))))
 
+(ert-deftest refine-format-value-t ()
+  "We should be able to show 't."
+  (should
+   (equal (refine--format-value t) "t")))
+
 (ert-deftest refine-format-value-string ()
   "Refine isn't very useful for strings, but we should show
 something sensible."
