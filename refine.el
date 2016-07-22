@@ -148,14 +148,14 @@ string listing the elements.
 
 VALUE may be a list, string, vector or symbol."
   (cond
-   ((stringp value)
-    (propertize (refine--pretty-format value) 'refine-index 'scalar))
    ((vectorp value)
     (refine--format-with-index (refine--vector->list value)))
 
    ((null value)
     (propertize "nil" 'refine-index 'empty))
-   ((symbolp value)
+
+   ;; Scalar values are values that we treat as a single item.
+   ((or (symbolp value) (stringp value) (numberp value))
     (propertize (refine--pretty-format value) 'refine-index 'scalar))
 
    ((refine--dotted-pair-p value)
@@ -504,6 +504,7 @@ If CURRENT is at the end, or not present, use the first item."
           ((stringp value) "a string")
           ((null value) "nil")
           ((symbolp value) "a symbol")
+          ((numberp value) "a number")
           ((and (consp value) (not (consp (cdr value))) (not (null (cdr value))))
            "a pair")
           ((and (consp value) (list-utils-cyclic-p value))

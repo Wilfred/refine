@@ -27,6 +27,13 @@
     (refine--format-with-index 'foo)
     (propertize "'foo" 'refine-index 'scalar))))
 
+(ert-deftest refine-format-value-numbers ()
+  "We should be able to format arbitrary numbers."
+  (should
+   (equal-including-properties
+    (refine--format-with-index 1)
+    (propertize "1" 'refine-index 'scalar))))
+
 (ert-deftest refine-format-value-string ()
   "Refine isn't very useful for strings, but we should show
 something sensible."
@@ -57,6 +64,10 @@ This ensures that vertical text lines up (the \" adds an offset)."
 (ert-deftest refine-describe-t ()
   (should (equal (refine--describe 'x t)
                  "x is a global variable. Its current value is a symbol")))
+
+(ert-deftest refine-describe-number ()
+  (should (equal (refine--describe 'x 1)
+                 "x is a global variable. Its current value is a number")))
 
 (ert-deftest refine-describe-single-element-list ()
   (should

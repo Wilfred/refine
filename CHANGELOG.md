@@ -6,6 +6,7 @@
 * Fixed a crash on variables that are set to strings.
 * Fixed an issue inserting values into an empty list.
 * Fixed various issues with viewing values set to symbols.
+* Fixed an issue with viewing values set to numbers.
 * Added the ability to cycle values or list elements within custom
   variables.
 
