@@ -523,6 +523,7 @@ If CURRENT is at the end, or not present, use the first item."
                          pretty-symbol symbol-descripton
                          type-description))))
 
+;; TODO: add demo in readme of this command.
 (defun refine-cycle ()
   "Cycle the variable or list element through all possible values.
 For booleans, toggle nil/t."
