@@ -423,19 +423,19 @@ If DISTANCE is negative, move backwards."
             (while (equal (refine--index-at-point) target-index)
               (forward-line -1))
             ;; Move back to the first line of this value.
-            (forward-line 1))))))
+            (forward-line 1)))))))
 
-  (defun refine-edit (new-value)
-    "Edit the current item in the list."
-    (interactive
-     (let* ((lst (symbol-value refine--symbol))
-            (index (refine--index-at-point))
-            (prompt (format "Set value at %s: " index))
-            (current-value (nth index lst)))
-       (list (refine--read-element refine--symbol prompt
-                                   (refine--pretty-format current-value)))))
-    (setf (nth (refine--index-at-point) (symbol-value refine--symbol)) new-value)
-    (refine-update)))
+(defun refine-edit (new-value)
+  "Edit the current item in the list."
+  (interactive
+   (let* ((lst (symbol-value refine--symbol))
+          (index (refine--index-at-point))
+          (prompt (format "Set value at %s: " index))
+          (current-value (nth index lst)))
+     (list (refine--read-element refine--symbol prompt
+                                 (refine--pretty-format current-value)))))
+  (setf (nth (refine--index-at-point) (symbol-value refine--symbol)) new-value)
+  (refine-update))
 
 (defun refine-next (arg)
   "Move point to the next item.
