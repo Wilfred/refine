@@ -50,9 +50,17 @@
   "Return a list of the possible list elements SYMBOL can have.
 Returns nil if SYMBOL is not a custom variable."
   (when (custom-variable-p symbol)
-    ;; If custom-type takes the form '(repeat (choice (...)))
-    (-let [(repeat-sym (choice-sym . choices)) (get symbol 'custom-type)]
-      (when (and (eq repeat-sym 'repeat) (eq choice-sym 'choice))
+    (let ((custom-type (get symbol 'custom-type))
+          choices)
+      ;; If custom-type takes the form '(repeat (choice (...)))
+      (-when-let ((repeat-sym (choice-sym . repeated-choices)) custom-type)
+        (when (and (eq repeat-sym 'repeat) (eq choice-sym 'choice))
+          (setq choices repeated-choices)))
+      ;; If custom-type takes the form '(set (...))
+      (-when-let ((set-sym . set-choices) custom-type)
+        (when (eq set-sym 'set)
+          (setq choices set-choices)))
+      (when choices
         ;; (const :tag "Cider" cider) => 'cider
         (->> choices
              (--filter (consp it))

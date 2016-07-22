@@ -61,6 +61,23 @@ specific possibilities."
       (user-error (setq user-error-called t)))
     (should user-error-called)))
 
+(defcustom refine--test-var-choices-set '(baz)
+  "Apparently cask insists on a docstring here."
+  :type '(set
+          (const :tag "Foo" foo)
+          (const :tag "Bar" bar)
+          (const :tag "Baz" baz)))
+
+;; TODO: should we be smarter and prevent users inserting duplicates?
+(ert-deftest refine-cycle-choices-set ()
+  "If our options are a set, we should still cycle."
+  (refine 'refine--test-var-choices-set)
+  ;; Move point to the first value.
+  (refine-next 1)
+  ;; Cycle once, which should wrap around.
+  (refine-cycle)
+  (should (equal refine--test-var-choices-set '(foo))))
+
 ;; TODO: move to a better file.
 (ert-deftest refine-variables-not-functions ()
   (let ((vars (refine--variables)))
