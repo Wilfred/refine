@@ -44,6 +44,10 @@ This ensures that vertical text lines up (the \" adds an offset)."
   (should (equal (refine--describe 'x nil)
                  "x is a global variable. Its current value is nil")))
 
+(ert-deftest refine-describe-t ()
+  (should (equal (refine--describe 'x t)
+                 "x is a global variable. Its current value is a symbol")))
+
 (ert-deftest refine-describe-single-element-list ()
   (should
    (equal (refine--describe 'x (list 'foo))

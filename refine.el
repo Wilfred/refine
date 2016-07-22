@@ -470,6 +470,7 @@ With a numeric prefix, move that many items."
          (cond
           ((stringp value) "a string")
           ((null value) "nil")
+          ((symbolp value) "a symbol")
           ((and (consp value) (not (consp (cdr value))) (not (null (cdr value))))
            "a pair")
           ((and (consp value) (list-utils-cyclic-p value))
