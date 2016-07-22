@@ -46,6 +46,15 @@
                   (push symbol symbols))))
     symbols))
 
+(defun refine--custom-values (const-spec)
+  "Given a list of (const ...) items from a `defcustom' spec,
+ return the possible values."
+  ;; E.g. (const :tag "Cider" cider) => 'cider
+  (->> const-spec
+       (--filter (consp it))
+       (--filter (eq (-first-item it) 'const))
+       (-map #'-last-item)))
+
 (defun refine--possible-elements (symbol)
   "Return a list of the possible list elements SYMBOL can have.
 Returns nil if SYMBOL is not a custom variable."
@@ -61,11 +70,7 @@ Returns nil if SYMBOL is not a custom variable."
         (when (eq set-sym 'set)
           (setq choices set-choices)))
       (when choices
-        ;; (const :tag "Cider" cider) => 'cider
-        (->> choices
-             (--filter (consp it))
-             (--filter (eq (-first-item it) 'const))
-             (-map #'-last-item))))))
+        (refine--custom-values choices)))))
 
 (defun refine--possible-values (symbol)
   "Return a list of the possible values SYMBOL can have.
@@ -74,10 +79,7 @@ Returns nil if SYMBOL is not a custom variable."
     ;; If custom-type takes the form '(choice (...)))
     (-let [(choice-sym . choices) (get symbol 'custom-type)]
       (when (eq choice-sym 'choice)
-        ;; (const :tag "Cider" cider) => 'cider
-        (->> choices
-             (--filter (eq (-first-item it) 'const))
-             (-map #'-last-item))))))
+        (refine--custom-values choices)))))
 
 (defun refine--pretty-format (value)
   "Pretty print VALUE as a string."
