@@ -78,6 +78,23 @@ specific possibilities."
   (refine-cycle)
   (should (equal refine--test-var-choices-set '(foo))))
 
+(defcustom refine--test-var-radio 'a
+  "Apparently cask insists on a docstring here."
+  :type '(radio
+          (const :tag "Foo" a)
+          (const :tag "Bar" b)
+          (const :tag "Baz" c)))
+
+(ert-deftest refine-cycle-choices-set ()
+  "If our options are a set, we should still cycle."
+  (refine 'refine--test-var-radio)
+  ;; Move point to the first value.
+  (refine-next 1)
+  ;; Cycle once, which should change the value, even though it's not a
+  ;; list.
+  (refine-cycle)
+  (should (equal refine--test-var-radio 'b)))
+
 ;; TODO: move to a better file.
 (ert-deftest refine-variables-not-functions ()
   (let ((vars (refine--variables)))

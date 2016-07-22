@@ -76,9 +76,9 @@ Returns nil if SYMBOL is not a custom variable."
   "Return a list of the possible values SYMBOL can have.
 Returns nil if SYMBOL is not a custom variable."
   (when (custom-variable-p symbol)
-    ;; If custom-type takes the form '(choice (...)))
-    (-let [(choice-sym . choices) (get symbol 'custom-type)]
-      (when (eq choice-sym 'choice)
+    ;; If custom-type takes the form '(choice (...))) or '(radio (...))
+    (-let [(kind . choices) (get symbol 'custom-type)]
+      (when (or (eq kind 'choice) (eq kind 'radio))
         (refine--custom-values choices)))))
 
 (defun refine--pretty-format (value)
