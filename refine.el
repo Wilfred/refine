@@ -56,6 +56,18 @@ Returns nil if SYMBOL is not a custom variable."
              (--filter (eq (-first-item it) 'const))
              (-map #'-last-item))))))
 
+(defun refine--possible-values (symbol)
+  "Return a list of the possible values SYMBOL can have.
+Returns nil if SYMBOL is not a custom variable."
+  (when (custom-variable-p symbol)
+    ;; If custom-type takes the form '(choice (...)))
+    (-let [(choice-sym . choices) (get symbol 'custom-type)]
+      (when (eq choice-sym 'choice)
+        ;; (const :tag "Cider" cider) => 'cider
+        (->> choices
+             (--filter (eq (-first-item it) 'const))
+             (-map #'-last-item))))))
+
 (defun refine--pretty-format (value)
   "Pretty print VALUE as a string."
   (let ((cl-formatted (with-temp-buffer
@@ -447,6 +459,12 @@ With a numeric prefix, move that many items."
                   (equal (refine--index-at-point) index))
     (forward-line 1)))
 
+(defun refine--next-item (current items)
+  "Given a list ITEMS, return the item after CURRENT.
+If CURRENT is at the end, or not present, use the first item."
+  (let ((index (or (-elem-index current items) -1)))
+    (nth (1+ index) (-cycle items))))
+
 (defun refine--buffer (symbol)
   "Get or create a refine buffer for SYMBOL."
   (assert (symbolp symbol))
@@ -494,6 +512,41 @@ With a numeric prefix, move that many items."
                          pretty-symbol symbol-descripton
                          type-description))))
 
+(defun refine-cycle ()
+  "Cycle the variable or list element through all possible values.
+For booleans, toggle nil/t."
+  (interactive)
+  (let ((value (symbol-value refine--symbol))
+        (index (refine--index-at-point)))
+    (cond
+     ;; If we're on a list element of a `defcustom', try to cycle
+     ;; the element.
+     ((and (custom-variable-p refine--symbol) (consp value))
+      (unless index
+        (user-error "No list element at point"))
+      ;; Find the values that an element can take.
+      (let ((values (refine--possible-elements refine--symbol))
+            (element-value (nth index value)))
+        (if values
+            ;; Set this element to the next possible value.
+            (setf (nth index value) (refine--next-item element-value values))
+          (user-error "I don't know what values elements of '%s can take" refine--symbol))))
+     ;; For other `defcustom' values, cycle the whole variable.
+     ((custom-variable-p refine--symbol)
+      (-if-let (values (refine--possible-values refine--symbol))
+          ;; Set to the next value.
+          (set refine--symbol (refine--next-item value values))
+        (user-error "I don't know what values '%s can take" refine--symbol)))
+     ;; Toggle booleans.
+     ((null value)
+      (set refine--symbol t))
+     ((eq value t)
+      (set refine--symbol nil))
+     ;; Otherwise, we don't know what to do.
+     (t
+      (user-error "'%s is not a custom variable, so cannot cycle it" refine--symbol)))
+    (refine-update)))
+
 ;;;###autoload
 (defun refine (symbol)
   "Interactively edit the value of a symbol \(usually a list\)."
@@ -515,6 +568,7 @@ With a numeric prefix, move that many items."
 ;; Modifying the list.
 (define-key refine-mode-map (kbd "e") #'refine-edit)
 (define-key refine-mode-map (kbd "RET") #'refine-edit)
+(define-key refine-mode-map (kbd "c") #'refine-cycle)
 (define-key refine-mode-map (kbd "k") #'refine-delete)
 (define-key refine-mode-map (kbd "a") #'refine-insert-after)
 (define-key refine-mode-map (kbd "i") #'refine-insert)
