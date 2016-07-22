@@ -122,8 +122,10 @@ return a pretty, propertized string."
 ;; TODO: rename this function. format-element, format-value and
 ;; pretty-format is confusing.
 (defun refine--format-value (value)
-  "Given a list or vector VALUE, return a pretty propertized
-string listing the elements."
+  "Given an elisp VALUE, return a pretty propertized
+string listing the elements.
+
+VALUE may be a list, string, vector or symbol."
   (cond
    ((stringp value)
     (refine--pretty-format value))
@@ -132,8 +134,8 @@ string listing the elements."
 
    ((null value)
     (propertize "nil" 'refine-index 'empty))
-   ((eq value t)
-    "t")
+   ((symbolp value)
+    (refine--pretty-format value))
 
    ((refine--dotted-pair-p value)
     (format "%s\n%s"

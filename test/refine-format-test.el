@@ -20,6 +20,11 @@
   (should
    (equal (refine--format-value t) "t")))
 
+(ert-deftest refine-format-value-symbols ()
+  "We should be able to format arbitrary symbols."
+  (should
+   (equal (refine--format-value 'foo) "'foo")))
+
 (ert-deftest refine-format-value-string ()
   "Refine isn't very useful for strings, but we should show
 something sensible."
