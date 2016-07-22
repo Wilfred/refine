@@ -23,12 +23,17 @@
 (ert-deftest refine-format-value-symbols ()
   "We should be able to format arbitrary symbols."
   (should
-   (equal (refine--format-value 'foo) "'foo")))
+   (equal-including-properties
+    (refine--format-value 'foo)
+    (propertize "'foo" 'refine-index 'scalar))))
 
 (ert-deftest refine-format-value-string ()
   "Refine isn't very useful for strings, but we should show
 something sensible."
-  (should (equal (refine--format-value "foo") "\"foo\"")))
+  (should
+   (equal-including-properties
+    (refine--format-value "foo")
+    (propertize "\"foo\"" 'refine-index 'scalar))))
 
 (ert-deftest refine-format-string ()
   (should (equal (refine--pretty-format "abc\"def") "\"abc\\\"def\"")))

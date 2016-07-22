@@ -140,14 +140,14 @@ string listing the elements.
 VALUE may be a list, string, vector or symbol."
   (cond
    ((stringp value)
-    (refine--pretty-format value))
+    (propertize (refine--pretty-format value) 'refine-index 'scalar))
    ((vectorp value)
     (refine--format-value (refine--vector->list value)))
 
    ((null value)
     (propertize "nil" 'refine-index 'empty))
    ((symbolp value)
-    (refine--pretty-format value))
+    (propertize (refine--pretty-format value) 'refine-index 'scalar))
 
    ((refine--dotted-pair-p value)
     (format "%s\n%s"
