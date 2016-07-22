@@ -45,6 +45,22 @@ description changes."
   ;; We should have point positioned on the newly inserted item.
   (should (looking-at "0 'a")))
 
+(defcustom refine--test-var-no-choices '(x y)
+  "Apparently cask insists on a docstring here."
+  :type '(repeat (choice symbol)))
+
+(ert-deftest refine-cycle-but-symbols-without-choices ()
+  "We should call user-error if defcustom does not specify
+specific possibilities."
+  (refine 'refine--test-var-no-choices)
+  ;; Move to the first item.
+  (refine-next 1)
+  (let ((user-error-called nil))
+    (condition-case err
+        (refine-cycle)
+      (user-error (setq user-error-called t)))
+    (should user-error-called)))
+
 ;; TODO: move to a better file.
 (ert-deftest refine-variables-not-functions ()
   (let ((vars (refine--variables)))

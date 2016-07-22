@@ -55,6 +55,7 @@ Returns nil if SYMBOL is not a custom variable."
       (when (and (eq repeat-sym 'repeat) (eq choice-sym 'choice))
         ;; (const :tag "Cider" cider) => 'cider
         (->> choices
+             (--filter (consp it))
              (--filter (eq (-first-item it) 'const))
              (-map #'-last-item))))))
 
