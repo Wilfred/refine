@@ -63,3 +63,19 @@ GPLv3.
 ## Installation
 
 Install from MELPA (recommended), or add refine.el to `load-path`.
+
+## Tests
+
+You can run tests inside Emacs by just opening the test files and
+doing `M-x eval-buffer` `M-x ert RET t RET`.
+
+Alternatively, you can run the test from a shell:
+
+```
+$ cask install
+$ cask exec ert-runner
+```
+
+Note that refine has had infinite loop bugs during development, so you
+may need to press Ctrl-C if tests don't terminate.
+
