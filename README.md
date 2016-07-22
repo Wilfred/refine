@@ -35,6 +35,7 @@ Editing:
 |  command               | binding           |
 |------------------------|-------------------|
 | `refine-edit`          | <kbd>e</kbd> or <kbd>RET</kbd>      |
+| `refine-cycle`         | <kbd>c</kbd>      |
 | `refine-insert`        | <kbd>i</kbd>      |
 | `refine-insert-after`  | <kbd>a</kbd>      |
 | `refine-delete`        | <kbd>k</kbd>      |
