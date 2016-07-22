@@ -24,6 +24,7 @@
   ;; We should have point positioned on the newly inserted item.
   (should (looking-at "0 'a")))
 
+;; TODO: move to a better file.
 (ert-deftest refine-variables-not-functions ()
   (let ((vars (refine--variables)))
     (should (-contains-p vars 'kill-ring))
