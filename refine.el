@@ -426,7 +426,7 @@ If DISTANCE is negative, move backwards."
             (forward-line 1)))))))
 
 ;; TODO: it would be nice for variables like `racer-cmd' (custom
-;; variables for file paths) to be configurable here too.
+;; variables for file paths) to be editable here too.
 (defun refine-edit (new-value)
   "Edit the current item in the list."
   (interactive
