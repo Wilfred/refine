@@ -1,6 +1,8 @@
 ;;; refine.el --- interactive value editing         -*- lexical-binding: t; -*-
 
 ;; TODO: prompt the user to choose between local and global variables
+;; TODO: Link to help for that variable
+;; TODO: Link to variable definition, if known
 
 ;; Copyright (C) 2016  
 
