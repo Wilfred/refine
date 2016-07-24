@@ -95,6 +95,16 @@ specific possibilities."
   (refine-cycle)
   (should (equal refine--test-var-radio 'b)))
 
+(defcustom refine--test-var-bool nil
+  "Apparently cask insists on a docstring here."
+  :type 'boolean)
+
+(ert-deftest refine-cycle-bool ()
+  "We should be able to cycle booleans."
+  (refine 'refine--test-var-bool)
+  (refine-cycle)
+  (should (eq refine--test-var-bool t)))
+
 ;; TODO: move to a better file.
 (ert-deftest refine-variables-not-functions ()
   (let ((vars (refine--variables)))

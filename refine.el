@@ -76,10 +76,12 @@ Returns nil if SYMBOL is not a custom variable."
   "Return a list of the possible values SYMBOL can have.
 Returns nil if SYMBOL is not a custom variable."
   (when (custom-variable-p symbol)
-    ;; If custom-type takes the form '(choice (...))) or '(radio (...))
-    (-let [(kind . choices) (get symbol 'custom-type)]
-      (when (or (eq kind 'choice) (eq kind 'radio))
-        (refine--custom-values choices)))))
+    (let ((custom-type (get symbol 'custom-type)))
+      ;; If custom-type takes the form '(choice (...))) or '(radio (...))
+      (when (consp custom-type)
+        (-let [(kind . choices) custom-type]
+          (when (or (eq kind 'choice) (eq kind 'radio))
+            (refine--custom-values choices)))))))
 
 (defun refine--pretty-format (value)
   "Pretty print VALUE as a string."
@@ -529,7 +531,8 @@ If CURRENT is at the end, or not present, use the first item."
 For booleans, toggle nil/t."
   (interactive)
   (let ((value (symbol-value refine--symbol))
-        (index (refine--index-at-point)))
+        (index (refine--index-at-point))
+        (possible-values (refine--possible-values refine--symbol)))
     (cond
      ;; If we're on a list element of a `defcustom', try to cycle
      ;; the element.
@@ -544,11 +547,9 @@ For booleans, toggle nil/t."
             (setf (nth index value) (refine--next-item element-value values))
           (user-error "I don't know what values elements of '%s can take" refine--symbol))))
      ;; For other `defcustom' values, cycle the whole variable.
-     ((custom-variable-p refine--symbol)
-      (-if-let (values (refine--possible-values refine--symbol))
-          ;; Set to the next value.
-          (set refine--symbol (refine--next-item value values))
-        (user-error "I don't know what values '%s can take" refine--symbol)))
+     ((and (custom-variable-p refine--symbol) possible-values)
+      ;; Set to the next value.
+      (set refine--symbol (refine--next-item value possible-values)))
      ;; Toggle booleans.
      ((null value)
       (set refine--symbol t))
@@ -556,7 +557,7 @@ For booleans, toggle nil/t."
       (set refine--symbol nil))
      ;; Otherwise, we don't know what to do.
      (t
-      (user-error "'%s is not a custom variable, so cannot cycle it" refine--symbol)))
+      (user-error "I don't know what values '%s can take" refine--symbol)))
     (refine-update)))
 
 ;;;###autoload
