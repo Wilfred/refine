@@ -540,11 +540,11 @@ For booleans, toggle nil/t."
       (unless index
         (user-error "No list element at point"))
       ;; Find the values that an element can take.
-      (let ((values (refine--possible-elements refine--symbol))
+      (let ((possible-elements (refine--possible-elements refine--symbol))
             (element-value (nth index value)))
-        (if values
+        (if possible-elements
             ;; Set this element to the next possible value.
-            (setf (nth index value) (refine--next-item element-value values))
+            (setf (nth index value) (refine--next-item element-value possible-elements))
           (user-error "I don't know what values elements of '%s can take" refine--symbol))))
      ;; For other `defcustom' values, cycle the whole variable.
      ((and (custom-variable-p refine--symbol) possible-values)
