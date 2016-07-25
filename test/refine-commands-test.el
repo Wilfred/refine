@@ -115,6 +115,22 @@ specific possibilities."
   (refine-cycle)
   (should (eq refine--test-var-bool t)))
 
+(ert-deftest refine-move-forward ()
+  "We should be able to move elements forward in lists."
+  (setq refine--test-var '(a b c))
+  (refine 'refine--test-var)
+  (refine-next 1)
+  (refine-move-forward 1)
+  (should (equal refine--test-var '(b a c))))
+
+(ert-deftest refine-move-backward ()
+  "We should be able to move elements backward in lists."
+  (setq refine--test-var '(a b c))
+  (refine 'refine--test-var)
+  (refine-next 3)
+  (refine-move-backward 1)
+  (should (equal refine--test-var '(a c b))))
+
 ;; TODO: move to a better file.
 (ert-deftest refine-variables-not-functions ()
   (let ((vars (refine--variables)))
