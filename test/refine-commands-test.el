@@ -131,6 +131,17 @@ specific possibilities."
   (refine-move-backward 1)
   (should (equal refine--test-var '(a c b))))
 
+(ert-deftest refine-move-forward-without-list ()
+  "Fail gracefully if we don't have any list elements to move."
+  (setq refine--test-var-bool nil)
+  (refine 'refine--test-var-bool)
+  (refine-next 1)
+  (let ((user-error-called nil))
+    (condition-case err
+        (refine-move-forward 1)
+      (user-error (setq user-error-called t)))
+    (should user-error-called)))
+
 ;; TODO: move to a better file.
 (ert-deftest refine-variables-not-functions ()
   (let ((vars (refine--variables)))

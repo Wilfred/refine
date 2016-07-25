@@ -370,10 +370,10 @@ Equivalent to interactive \"X\"."
 When called with a prefix, move that many positions."
   (interactive "p")
   ;; Move the element.
-  (refine--move-element
-   (symbol-value refine--symbol)
-   (refine--index-at-point)
-   arg)
+  (let ((index (refine--index-at-point)))
+    (if (numberp index)
+        (refine--move-element (symbol-value refine--symbol) index arg)
+      (user-error "No list element here")))
   (refine-update)
   ;; Move point to match.
   (refine-next arg))
