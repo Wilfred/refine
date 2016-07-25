@@ -1,6 +1,7 @@
 # v0.3
 
 * Fixed an issue with cycling custom boolean variables.
+* Fixed a crash on reordering list elements.
 
 # v0.2
 
