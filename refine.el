@@ -566,7 +566,8 @@ For booleans, toggle nil/t."
   (interactive (list (read (completing-read "Variable: " (refine--variables)))))
   (let* ((buf (refine--buffer symbol)))
     (refine--update buf symbol)
-    (switch-to-buffer buf)))
+    (switch-to-buffer buf)
+    (goto-char (point-min))))
 
 (define-derived-mode refine-mode fundamental-mode "Refine"
   "A major mode for interactively editing elisp values."

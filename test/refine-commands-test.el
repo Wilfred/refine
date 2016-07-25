@@ -7,6 +7,16 @@
 
 (defvar refine--test-var)
 
+(ert-deftest refine-resets-point ()
+  "Calling the refine command should reset the point position.
+Otherwise, our tests can interfere with each other!"
+  (setq refine--test-var '(a b c))
+  (refine 'refine--test-var)
+  (let ((start-pos (point)))
+    (refine-next 2)
+    (refine 'refine--test-var)
+    (should (equal start-pos (point)))))
+
 (ert-deftest refine-update-preserves-position ()
   "`refine-update' should not move point, even if the value
 description changes."
