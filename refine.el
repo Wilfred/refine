@@ -187,19 +187,20 @@ VALUE may be a list, string, vector or symbol."
 
 (defun refine--update (buffer symbol)
   "Update BUFFER with the current value of SYMBOL."
-  (with-current-buffer buffer
-    (let* ((value (symbol-value symbol))
-           (current-line (line-number-at-pos))
-           (current-column (current-column))
-           buffer-read-only)
-      (erase-buffer)
-      (insert (format "%s:\n\n" (refine--describe symbol value)))
-      (insert (refine--format-with-index value))
-      ;; We can't use `save-excursion' because we erased the whole
-      ;; buffer. Go back to the previous position.
-      (goto-char (point-min))
-      (forward-line (1- current-line))
-      (forward-char current-column))))
+  (let ((orig-buffer (current-buffer))
+        (value (symbol-value symbol)))
+    (with-current-buffer buffer
+      (let* ((current-line (line-number-at-pos))
+             (current-column (current-column))
+             buffer-read-only)
+        (erase-buffer)
+        (insert (format "%s:\n\n" (refine--describe symbol value orig-buffer)))
+        (insert (refine--format-with-index value))
+        ;; We can't use `save-excursion' because we erased the whole
+        ;; buffer. Go back to the previous position.
+        (goto-char (point-min))
+        (forward-line (1- current-line))
+        (forward-char current-column)))))
 
 (defvar-local refine--symbol nil
   "The symbol being inspected in the current buffer.")
@@ -497,14 +498,14 @@ If CURRENT is at the end, or not present, use the first item."
        (not (consp (cdr value))) (not (null (cdr value)))))
 
 ;; TODO: support hash maps
-(defun refine--describe (symbol value)
-  "Return a human-readable description for SYMBOL set to VALUE."
+(defun refine--describe (symbol value buffer)
+  "Return a human-readable description for SYMBOL set to VALUE in BUFFER."
   (let ((pretty-symbol
          (propertize (format "%s" symbol)
                      'face 'font-lock-variable-name-face))
         (symbol-descripton
          (if (local-variable-p symbol)
-             (format "a local variable in buffer %s" (current-buffer))
+             (format "a local variable in buffer %s" buffer)
            "a global variable"))
         (type-description
          (cond
