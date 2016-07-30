@@ -19,6 +19,7 @@ editing files, but for changing elisp variables that are set to lists.
     - [License](#license)
     - [Installation](#installation)
     - [Tests](#tests)
+    - [Related projects](#related-projects)
 
 <!-- markdown-toc end -->
 
@@ -95,3 +96,12 @@ $ cask exec ert-runner
 Note that refine has had infinite loop bugs during development, so you
 may need to press Ctrl-C if tests don't terminate.
 
+## Related projects
+
+`counsel-set-variable` (part of
+[ivy](https://github.com/abo-abo/swiper)) is also an excellent way of
+editing variables in Emacs.
+
+[edit-list](https://github.com/emacsmirror/edit-list) provides list
+editing in a very similar style to refine. It doesn't edit in-place,
+nor work as well for hooks, but does provide an elegant, Emacsy UI.
