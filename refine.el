@@ -567,7 +567,10 @@ For booleans, toggle nil/t."
 ;;;###autoload
 (defun refine (symbol)
   "Interactively edit the value of a symbol \(usually a list\)."
-  (interactive (list (read (completing-read "Variable: " (refine--variables)))))
+  (interactive (list (read (completing-read "Variable: " (refine--variables)
+                                            nil nil nil nil
+                                            (-if-let (variable (variable-at-point))
+                                                (and (symbolp variable) (symbol-name variable)))))))
   (let* ((buf (refine--buffer symbol)))
     (refine--update buf symbol)
     (switch-to-buffer buf)
