@@ -6,8 +6,9 @@
 
 ***finally, an editor for Emacs!***
 
-Refine provides a convenient UI for editing lists. Refine is not for
-editing files, but for changing elisp variables that are set to lists.
+Refine provides a convenient UI for editing variables. Refine is not
+for editing files, but for changing elisp variables, particularly
+lists.
 
 <!-- markdown-toc start - Don't edit this section. Run M-x markdown-toc-generate-toc again -->
 **Table of Contents**
