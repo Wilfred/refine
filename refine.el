@@ -150,7 +150,10 @@ return a pretty, propertized string."
   "Given an elisp VALUE, return a pretty propertized
 string listing the elements.
 
-VALUE may be a list, string, vector or symbol."
+VALUE may be a list, string, vector or symbol.
+
+If VALUE is a list or vector, show each list item along with its
+index."
   (cond
    ((vectorp value)
     (refine--format-with-index (refine--vector->list value)))
