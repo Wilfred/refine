@@ -55,6 +55,14 @@ description changes."
   ;; We should have point positioned on the newly inserted item.
   (should (looking-at "0 'a")))
 
+(ert-deftest refine-edit-lists ()
+  "We should be able to call `refine-edit' on a list."
+  (setq refine--test-var '(a b c))
+  (refine 'refine--test-var)
+  (refine-next 1)
+  (refine-edit 'xxx)
+  (should (equal refine--test-var '(xxx b c))))
+
 (defcustom refine--test-var-no-choices '(x y)
   "Apparently cask insists on a docstring here."
   :type '(repeat (choice symbol)))
