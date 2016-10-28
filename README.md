@@ -17,7 +17,6 @@ lists.
     - [Usage examples](#usage-examples)
     - [Limitations](#limitations)
     - [Keybindings](#keybindings)
-    - [License](#license)
     - [Installation](#installation)
     - [Tests](#tests)
     - [Related projects](#related-projects)
@@ -73,10 +72,6 @@ Buffer commands:
 | `refine-update`        | <kbd>g</kbd>      |
 | `kill-this-buffer`     | <kbd>q</kbd>      |
 
-
-## License
-
-GPLv3.
 
 ## Installation
 
