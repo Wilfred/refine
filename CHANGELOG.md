@@ -2,6 +2,8 @@
 
 * Fixed an issue with cycling custom boolean variables.
 * Fixed several crashes on reordering list elements.
+* When prompting for a variable, refine now defaults the variable at
+  point.
 
 # v0.2
 
