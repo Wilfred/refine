@@ -1,3 +1,7 @@
+# v0.4
+
+No changes yet.
+
 # v0.3
 
 * Fixed an issue with cycling custom boolean variables.
