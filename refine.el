@@ -1,8 +1,6 @@
 ;;; refine.el --- interactive value editing         -*- lexical-binding: t; -*-
 
 ;; TODO: prompt the user to choose between local and global variables
-;; TODO: Link to help for that variable
-;; TODO: Link to variable definition, if known
 
 ;; Copyright (C) 2016  
 
@@ -188,6 +186,40 @@ index."
                            formatted-elements)))
       (s-join "\n" propertized-elements)))))
 
+(define-button-type 'refine-help-button
+  'action 'refine--open-help
+  'follow-link t
+  'help-echo "View in *Help* buffer")
+
+(defun refine--open-help (button)
+  (describe-variable (button-get button 'symbol)))
+
+(defun refine--help-button (symbol)
+  "Return a button that opens a help buffer for SYMBOL."
+  (with-temp-buffer
+    (insert-text-button
+     "Help"
+     :type 'refine-help-button
+     'symbol symbol)
+    (buffer-string)))
+
+(define-button-type 'refine-definition-button
+  'action 'refine--go-to-definition
+  'follow-link t
+  'help-echo "Go to definition")
+
+(defun refine--go-to-definition (button)
+  (find-variable (button-get button 'symbol)))
+
+(defun refine--definition-button (symbol)
+  "Return a button that navigates to the definition of SYMBOL."
+  (with-temp-buffer
+    (insert-text-button
+     "Definition"
+     :type 'refine-definition-button
+     'symbol symbol)
+    (buffer-string)))
+
 (defun refine--update (buffer symbol)
   "Update BUFFER with the current value of SYMBOL."
   (let ((orig-buffer (current-buffer))
@@ -199,6 +231,8 @@ index."
         (erase-buffer)
         (insert (format "%s:\n\n" (refine--describe symbol value orig-buffer)))
         (insert (refine--format-with-index value))
+        (insert "\n\n")
+        (insert (refine--help-button symbol) " " (refine--definition-button symbol))
         ;; We can't use `save-excursion' because we erased the whole
         ;; buffer. Go back to the previous position.
         (goto-char (point-min))

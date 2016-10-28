@@ -4,6 +4,8 @@
 * Fixed several crashes on reordering list elements.
 * When prompting for a variable, refine now defaults the variable at
   point.
+* Refine buffers now include links to help and the definition of
+  variables.
 
 # v0.2
 
