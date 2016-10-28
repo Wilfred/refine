@@ -63,6 +63,14 @@ description changes."
   (refine-edit 'xxx)
   (should (equal refine--test-var '(xxx b c))))
 
+(ert-deftest refine-edit-vectors ()
+  "We should be able to call `refine-edit' on a vector."
+  (setq refine--test-var (vector 1 2 3))
+  (refine 'refine--test-var)
+  (refine-next 1)
+  (refine-edit 99)
+  (should (equal refine--test-var (vector 99 2 3))))
+
 (defcustom refine--test-var-no-choices '(x y)
   "Apparently cask insists on a docstring here."
   :type '(repeat (choice symbol)))

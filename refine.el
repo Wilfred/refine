@@ -481,15 +481,16 @@ If DISTANCE is negative, move backwards."
 ;; TODO: it would be nice for variables like `racer-cmd' (custom
 ;; variables for file paths) to be editable here too.
 (defun refine-edit (new-value)
-  "Edit the current item in the list."
+  "Edit the current item in the list or vector."
   (interactive
    (let* ((lst (symbol-value refine--symbol))
           (index (refine--index-at-point))
           (prompt (format "Set value at %s: " index))
-          (current-value (nth index lst)))
+          (current-value (elt lst index)))
      (list (refine--read-element refine--symbol prompt
                                  (refine--pretty-format current-value)))))
-  (setf (nth (refine--index-at-point) (symbol-value refine--symbol)) new-value)
+  (setf (elt (symbol-value refine--symbol) (refine--index-at-point))
+        new-value)
   (refine-update))
 
 (defun refine-next (arg)

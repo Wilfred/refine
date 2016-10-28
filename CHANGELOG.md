@@ -1,6 +1,6 @@
 # v0.4
 
-No changes yet.
+* Added support for editing values in vectors.
 
 # v0.3
 
