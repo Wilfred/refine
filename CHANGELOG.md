@@ -1,6 +1,7 @@
 # v0.4
 
 * Added support for editing values in vectors.
+* Fixed an issue where `:foo` was formatted as `':foo`.
 
 # v0.3
 

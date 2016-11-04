@@ -97,8 +97,11 @@ Returns nil if SYMBOL is not a custom variable."
                                      (format " %s" it))
                                    lines)))
              (format "\"%s\"" (s-join "\n" indented-lines))))
-          ;; Print nil and t as-is.'
+          ;; Print nil and t as-is.
           ((or (eq t value) (eq nil value))
+           (format "%s" value))
+          ;; Print :foo symbols as-is.
+          ((and (symbolp value) (s-prefix? ":" (symbol-name value)))
            (format "%s" value))
           ;; Display other symbols, and lists, with a quote, so we
           ;; show usable syntax.

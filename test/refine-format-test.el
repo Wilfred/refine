@@ -8,6 +8,9 @@
   (should (equal (refine--pretty-format nil) "nil"))
   (should (equal (refine--pretty-format t) "t")))
 
+(ert-deftest refine-format-colon-symbol ()
+  (should (equal (refine--pretty-format :x) ":x")))
+
 (ert-deftest refine-format-value-empty-list ()
   "We should show a sensible value for an empty list."
   (should
