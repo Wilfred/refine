@@ -223,16 +223,15 @@ index."
      'symbol symbol)
     (buffer-string)))
 
-(defun refine--update (buffer symbol)
-  "Update BUFFER with the current value of SYMBOL."
-  (let ((orig-buffer (current-buffer))
-        (value (symbol-value symbol)))
-    (with-current-buffer buffer
+(defun refine--update (result-buffer target-buffer symbol)
+  "Update RESULT-BUFFER with the current value of SYMBOL in TARGET-BUFFER."
+  (let ((value (with-current-buffer target-buffer (symbol-value symbol))))
+    (with-current-buffer result-buffer
       (let* ((current-line (line-number-at-pos))
              (current-column (current-column))
              buffer-read-only)
         (erase-buffer)
-        (insert (format "%s:\n\n" (refine--describe symbol value orig-buffer)))
+        (insert (format "%s:\n\n" (refine--describe symbol value target-buffer)))
         (insert (refine--format-with-index value))
         (insert "\n\n")
         (insert (refine--help-button symbol) " " (refine--definition-button symbol))
@@ -245,12 +244,15 @@ index."
 (defvar-local refine--symbol nil
   "The symbol being inspected in the current buffer.")
 
+(defvar-local refine--target-buffer nil
+  "When inspecting buffer-local variable, use this buffer.")
+
 (defun refine-update ()
   "Update the current refine buffer."
   (interactive)
   (unless (eq major-mode #'refine-mode)
     (user-error "refine-update must be run in a refine buffer"))
-  (refine--update (current-buffer) refine--symbol))
+  (refine--update (current-buffer) refine--target-buffer refine--symbol))
 
 (defun refine--insert-list (list index value)
   "Insert VALUE at INDEX in LIST.
@@ -522,15 +524,16 @@ If CURRENT is at the end, or not present, use the first item."
   (let ((index (or (-elem-index current items) -1)))
     (nth (1+ index) (-cycle items))))
 
-(defun refine--buffer (symbol)
-  "Get or create a refine buffer for SYMBOL."
+(defun refine--buffer (symbol buffer)
+  "Get or create a refine buffer for SYMBOL in BUFFER."
   (assert (symbolp symbol))
-  (let ((buffer (get-buffer-create (format "*refine: %s*" symbol))))
-    (with-current-buffer buffer
+  (let ((result-buffer (get-buffer-create (format "*refine: %s*" symbol))))
+    (with-current-buffer result-buffer
       ;; Need to set the major mode before we set local variables.
       (refine-mode)
-      (setq-local refine--symbol symbol))
-    buffer))
+      (setq-local refine--symbol symbol)
+      (setq-local refine--target-buffer buffer))
+    result-buffer))
 
 ;; TODO: replace calls with just list-utils-improper-p
 (defun refine--dotted-pair-p (value)
@@ -612,9 +615,9 @@ For booleans, toggle nil/t."
                                             nil nil nil nil
                                             (-if-let (variable (variable-at-point))
                                                 (and (symbolp variable) (symbol-name variable)))))))
-  (let* ((buf (refine--buffer symbol)))
-    (refine--update buf symbol)
-    (switch-to-buffer buf)
+  (let* ((results-buffer (refine--buffer symbol (current-buffer))))
+    (refine--update results-buffer (current-buffer) symbol)
+    (switch-to-buffer results-buffer)
     (goto-char (point-min))))
 
 (define-derived-mode refine-mode fundamental-mode "Refine"
