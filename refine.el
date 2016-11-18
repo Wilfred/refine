@@ -544,8 +544,8 @@ If CURRENT is at the end, or not present, use the first item."
   (let ((pretty-symbol
          (propertize (format "%s" symbol)
                      'face 'font-lock-variable-name-face))
-        (symbol-descripton
          (if (local-variable-p symbol)
+        (symbol-description
              (format "a local variable in buffer %s" buffer)
            "a global variable"))
         (type-description
@@ -567,7 +567,7 @@ If CURRENT is at the end, or not present, use the first item."
           (:else "an unsupported type"))))
     (s-word-wrap 60
                  (format "%s is %s. Its current value is %s"
-                         pretty-symbol symbol-descripton
+                         pretty-symbol symbol-description
                          type-description))))
 
 ;; TODO: add demo in readme of this command.
