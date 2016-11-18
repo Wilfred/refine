@@ -565,7 +565,7 @@ If CURRENT is at the end, or not present, use the first item."
              (format "a %s containing %d %s"
                      type length units)))
           (:else "an unsupported type"))))
-    (s-word-wrap 60
+    (s-word-wrap 65
                  (format "%s is %s. Its current value is %s"
                          pretty-symbol symbol-description
                          type-description))))
