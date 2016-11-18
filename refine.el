@@ -544,8 +544,8 @@ If CURRENT is at the end, or not present, use the first item."
   (let ((pretty-symbol
          (propertize (format "%s" symbol)
                      'face 'font-lock-variable-name-face))
-         (if (local-variable-p symbol)
         (symbol-description
+         (if (local-variable-p symbol buffer)
              (format "a local variable in buffer %s" buffer)
            "a global variable"))
         (type-description
