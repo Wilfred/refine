@@ -189,6 +189,23 @@ index."
                            formatted-elements)))
       (s-join "\n" propertized-elements)))))
 
+(define-button-type 'refine-buffer-button
+  'action 'refine--switch-to-buffer
+  'follow-link t
+  'help-echo "Switch to this buffer")
+
+(defun refine--switch-to-buffer (button)
+  (switch-to-buffer (button-get button 'buffer)))
+
+(defun refine--buffer-button (buffer)
+  "Return a button that switches to BUFFER.."
+  (with-temp-buffer
+    (insert-text-button
+     (buffer-name buffer)
+     :type 'refine-buffer-button
+     'buffer buffer)
+    (buffer-string)))
+
 (define-button-type 'refine-help-button
   'action 'refine--open-help
   'follow-link t
@@ -549,7 +566,8 @@ If CURRENT is at the end, or not present, use the first item."
                      'face 'font-lock-variable-name-face))
         (symbol-description
          (if (local-variable-p symbol buffer)
-             (format "a local variable in buffer %s" buffer)
+             (format "a local variable in buffer %s"
+                     (refine--buffer-button buffer))
            "a global variable"))
         (type-description
          (cond

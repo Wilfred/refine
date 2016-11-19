@@ -4,6 +4,8 @@
 * Fixed an issue where `:foo` was formatted as `':foo`.
 * Fixed several issues where we showed the global value of a variable,
   instead of its buffer-local value.
+* Refine buffers now include a button to take you back to the relevant
+  buffer.
 
 # v0.3
 
