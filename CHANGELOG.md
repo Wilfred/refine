@@ -2,6 +2,8 @@
 
 * Added support for editing values in vectors.
 * Fixed an issue where `:foo` was formatted as `':foo`.
+* Fixed several issues where we showed the global value of a variable,
+  instead of its buffer-local value.
 
 # v0.3
 
