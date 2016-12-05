@@ -4,7 +4,7 @@
 [![MELPA](http://melpa.org/packages/refine-badge.svg)](http://melpa.org/#/refine)
 [![MELPA Stable](http://stable.melpa.org/packages/refine-badge.svg)](http://stable.melpa.org/#/refine)
 
-***finally, an editor for Emacs!***
+***inspect and modify elisp variables***
 
 Refine provides a convenient UI for editing variables. Refine is not
 for editing files, but for changing elisp variables, particularly
