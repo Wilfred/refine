@@ -6,6 +6,8 @@
   instead of its buffer-local value.
 * Refine buffers now include a button to take you back to the relevant
   buffer.
+* Fixed a crash on inserting values into a `defcustom` a type of
+  `'sexp`, such as `mode-line-format`.
 
 # v0.3
 

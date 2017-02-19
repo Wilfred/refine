@@ -55,18 +55,20 @@
 
 (defun refine--possible-elements (symbol)
   "Return a list of the possible list elements SYMBOL can have.
-Returns nil if SYMBOL is not a custom variable."
+Returns nil if SYMBOL is not a custom variable or if we can't
+make useful suggestions."
   (when (custom-variable-p symbol)
     (let ((custom-type (get symbol 'custom-type))
           choices)
-      ;; If custom-type takes the form '(repeat (choice (...)))
-      (-when-let ((repeat-sym (choice-sym . repeated-choices)) custom-type)
-        (when (and (eq repeat-sym 'repeat) (eq choice-sym 'choice))
-          (setq choices repeated-choices)))
-      ;; If custom-type takes the form '(set (...))
-      (-when-let ((set-sym . set-choices) custom-type)
-        (when (eq set-sym 'set)
-          (setq choices set-choices)))
+      (when (consp custom-type)
+        ;; If custom-type takes the form '(repeat (choice (...)))
+        (-when-let ((repeat-sym (choice-sym . repeated-choices)) custom-type)
+          (when (and (eq repeat-sym 'repeat) (eq choice-sym 'choice))
+            (setq choices repeated-choices)))
+        ;; If custom-type takes the form '(set (...))
+        (-when-let ((set-sym . set-choices) custom-type)
+          (when (eq set-sym 'set)
+            (setq choices set-choices))))
       (when choices
         (refine--custom-values choices)))))
 
