@@ -8,6 +8,8 @@
   buffer.
 * Fixed a crash on inserting values into a `defcustom` a type of
   `'sexp`, such as `mode-line-format`.
+* Variable descriptions now inform you if the variable has
+  buffer-local bindings.
 
 # v0.3
 
