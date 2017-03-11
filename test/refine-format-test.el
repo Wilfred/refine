@@ -75,4 +75,4 @@ This ensures that vertical text lines up (the \" adds an offset)."
 (ert-deftest refine-describe-single-element-list ()
   (should
    (equal (refine--describe 'x (list 'foo) nil)
-          "x is a global variable. Its current value is a list containing 1\nvalue")))
+          "x is a global variable. Its current value is a list containing 1 value")))

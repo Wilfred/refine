@@ -2,7 +2,7 @@
 
 ;; TODO: prompt the user to choose between local and global variables
 
-;; Copyright (C) 2016  
+;; Copyright (C) 2016-2017
 
 ;; Author: Wilfred Hughes <me@wilfred.me.uk>
 ;; Version: 0.4
@@ -561,37 +561,56 @@ If CURRENT is at the end, or not present, use the first item."
   (and (consp value)
        (not (consp (cdr value))) (not (null (cdr value)))))
 
+(defun refine--local-values (symbol)
+  "Return a list of pairs (buffer, value) for all buffers
+where SYMBOL is set."
+  (let (result)
+    (dolist (buf (buffer-list) result)
+      (when (local-variable-p symbol buf)
+        (push (cons buf (buffer-local-value symbol buf))
+              result)))))
+
 ;; TODO: support hash maps
 (defun refine--describe (symbol value buffer)
   "Return a human-readable description for SYMBOL set to VALUE in BUFFER."
-  (let ((pretty-symbol
-         (propertize (format "%s" symbol)
-                     'face 'font-lock-variable-name-face))
-        (symbol-description
-         (if (local-variable-p symbol buffer)
-             (format "a local variable in buffer %s"
-                     (refine--buffer-button buffer))
-           "a global variable"))
-        (type-description
-         (cond
-          ((stringp value) "a string")
-          ((null value) "nil")
-          ((symbolp value) "a symbol")
-          ((numberp value) "a number")
-          ((and (consp value) (not (consp (cdr value))) (not (null (cdr value))))
-           "a pair")
-          ((and (consp value) (list-utils-cyclic-p value))
-           "an improper list")
-          ((sequencep value)
-           (let* ((type (if (vectorp value) "vector" "list"))
-                  (length (length value))
-                  (units (if (= length 1) "value" "values")))
-             (format "a %s containing %d %s"
-                     type length units)))
-          (:else "an unsupported type"))))
-    (s-word-wrap 65
-                 (format "%s is %s. Its current value is %s"
+  (let* ((pretty-symbol
+          (propertize (format "%s" symbol)
+                      'face 'font-lock-variable-name-face))
+         (is-local (local-variable-p symbol buffer))
+         (symbol-description
+          (if is-local "local" "global"))
+         (local-description
+          (let ((locals (refine--local-values symbol)))
+            (if locals
+                (format " It has a buffer-local value in %d buffers."
+                        (length locals))
+              "")))
+         (type-description
+          (cond
+           ((stringp value) "a string")
+           ((null value) "nil")
+           ((symbolp value) "a symbol")
+           ((numberp value) "a number")
+           ((and (consp value) (not (consp (cdr value))) (not (null (cdr value))))
+            "a pair")
+           ((and (consp value) (list-utils-cyclic-p value))
+            "an improper list")
+           ((sequencep value)
+            (let* ((type (if (vectorp value) "vector" "list"))
+                   (length (length value))
+                   (units (if (= length 1) "value" "values")))
+              (format "a %s containing %d %s"
+                      type length units)))
+           (:else "an unsupported type")))
+         (value-intro
+          (if is-local
+              (format "local value in buffer %s"
+                      (refine--buffer-button buffer))
+            "current value")))
+    (s-word-wrap 70
+                 (format "%s is a %s variable.%s Its %s is %s"
                          pretty-symbol symbol-description
+                         local-description value-intro
                          type-description))))
 
 ;; TODO: add demo in readme of this command.
