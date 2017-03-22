@@ -5,6 +5,12 @@
   "Smoke test to ensure that we can show a complex list."
   (refine 'auto-mode-alist))
 
+(ert-deftest refine-unbound-smoke-test ()
+  "Smoke test to ensure that we can handle an unbound variable."
+  (refine 'no-such-variable)
+  (should (equal (s-trim (buffer-string))
+                 "no-such-variable is an unbound symbol.")))
+
 (defvar refine--test-var)
 
 (ert-deftest refine-resets-point ()

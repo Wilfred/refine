@@ -245,16 +245,20 @@ index."
 
 (defun refine--update (result-buffer target-buffer symbol)
   "Update RESULT-BUFFER with the current value of SYMBOL in TARGET-BUFFER."
-  (let ((value (with-current-buffer target-buffer (symbol-value symbol))))
+  (let (value)
+    (when (boundp symbol)
+      (with-current-buffer target-buffer
+        (setq value (symbol-value symbol))))
     (with-current-buffer result-buffer
       (let* ((current-line (line-number-at-pos))
              (current-column (current-column))
              buffer-read-only)
         (erase-buffer)
-        (insert (format "%s:\n\n" (refine--describe symbol value target-buffer)))
-        (insert (refine--format-with-index value))
-        (insert "\n\n")
-        (insert (refine--help-button symbol) " " (refine--definition-button symbol))
+        (insert (format "%s\n\n" (refine--describe symbol value target-buffer)))
+        (when (boundp symbol)
+          (insert (refine--format-with-index value))
+          (insert "\n\n")
+          (insert (refine--help-button symbol) " " (refine--definition-button symbol)))
         ;; We can't use `save-excursion' because we erased the whole
         ;; buffer. Go back to the previous position.
         (goto-char (point-min))
@@ -578,7 +582,14 @@ where SYMBOL is set."
                       'face 'font-lock-variable-name-face))
          (is-local (local-variable-p symbol buffer))
          (symbol-description
-          (if is-local "local" "global"))
+          (cond
+           ((not (boundp symbol))
+            "an unbound symbol")
+           (is-local
+            (format "a local variable in buffer %s"
+                    (refine--buffer-button buffer)))
+           (t
+            "a global variable")))
          (local-description
           (let ((locals (refine--local-values symbol)))
             (if locals
@@ -606,12 +617,16 @@ where SYMBOL is set."
           (if is-local
               (format "local value in buffer %s"
                       (refine--buffer-button buffer))
-            "current value")))
-    (s-word-wrap 70
-                 (format "%s is a %s variable.%s Its %s is %s"
-                         pretty-symbol symbol-description
-                         local-description value-intro
-                         type-description))))
+            "current value"))
+         (value-description
+          (if (boundp symbol)
+              (format " Its %s is %s:"
+                      value-intro type-description)
+            "")))
+    (s-word-wrap
+     70
+     (format "%s is %s.%s"
+             pretty-symbol symbol-description value-description))))
 
 ;; TODO: add demo in readme of this command.
 (defun refine-cycle ()
