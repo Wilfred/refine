@@ -606,6 +606,8 @@ where SYMBOL is set."
             "a pair")
            ((and (consp value) (list-utils-cyclic-p value))
             "an improper list")
+           ;; TODO: it would be nice to say 'a list of symbols' etc
+           ;; when all the elements are the same type.
            ((sequencep value)
             (let* ((type (if (vectorp value) "vector" "list"))
                    (length (length value))
