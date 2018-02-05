@@ -615,15 +615,10 @@ where SYMBOL is set."
               (format "a %s containing %d %s"
                       type length units)))
            (:else "an unsupported type")))
-         (value-intro
-          (if is-local
-              (format "local value in buffer %s"
-                      (refine--buffer-button buffer))
-            "current value"))
          (value-description
           (if (boundp symbol)
-              (format " Its %s is %s:"
-                      value-intro type-description)
+              (format " Its value is %s:"
+                      type-description)
             "")))
     (s-word-wrap
      70

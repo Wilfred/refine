@@ -60,22 +60,21 @@ This ensures that vertical text lines up (the \" adds an offset)."
 
 (ert-deftest refine-describe-dotted-list ()
   (should (equal (refine--describe 'x (cons 1 2) nil)
-                 "x is a global variable. Its current value is a pair:")))
+                 "x is a global variable. Its value is a pair:")))
 
 (ert-deftest refine-describe-nil ()
   (should (equal (refine--describe 'x nil nil)
-                 "x is a global variable. Its current value is nil:")))
+                 "x is a global variable. Its value is nil:")))
 
 (ert-deftest refine-describe-t ()
   (should (equal (refine--describe 'x t nil)
-                 "x is a global variable. Its current value is a symbol:")))
+                 "x is a global variable. Its value is a symbol:")))
 
 (ert-deftest refine-describe-number ()
   (should (equal (refine--describe 'x 1 nil)
-                 "x is a global variable. Its current value is a number:")))
+                 "x is a global variable. Its value is a number:")))
 
 (ert-deftest refine-describe-single-element-list ()
   (should
    (equal (refine--describe 'x (list 'foo) nil)
-          "x is a global variable. Its current value is a list containing 1
-value:")))
+          "x is a global variable. Its value is a list containing 1 value:")))
