@@ -243,6 +243,11 @@ index."
      'symbol symbol)
     (buffer-string)))
 
+(defun refine--symbol-value (symbol)
+  "Return the value of SYMBOL in the buffer that we're currently connected to."
+  (with-current-buffer (or refine--target-buffer (current-buffer))
+    (symbol-value symbol)))
+
 (defun refine--update (result-buffer target-buffer symbol)
   "Update RESULT-BUFFER with the current value of SYMBOL in TARGET-BUFFER."
   (let (value)
@@ -269,7 +274,7 @@ index."
   "The symbol being inspected in the current buffer.")
 
 (defvar-local refine--target-buffer nil
-  "When inspecting buffer-local variable, use this buffer.")
+  "When inspecting buffer-local variables, use this buffer.")
 
 (defun refine-update ()
   "Update the current refine buffer."
@@ -308,7 +313,7 @@ This mutates the list.
 If SYMBOL is nil, assigns to SYMBOL instead."
   (interactive)
   (assert (symbolp symbol))
-  (let* ((list (symbol-value symbol))
+  (let* ((list (refine--symbol-value symbol))
          (length (safe-length list)))
     (assert (or (consp list) (null list)))
     (cond
@@ -324,7 +329,7 @@ If SYMBOL is nil, assigns to SYMBOL instead."
 
 This creates a new vector and assigns it to SYMBOL. Vectors have
 fixed length, see *info* (elisp) Arrays."
-  (let* ((vector (symbol-value symbol))
+  (let* ((vector (refine--symbol-value symbol))
          (length (length vector)))
     (assert (and (vectorp vector) (< index length)))
 
@@ -358,7 +363,7 @@ This mutates the list."
 (defun refine--pop (symbol index)
   "Remote the item at INDEX in vectory/list variable SYMBOL.
 Mutates the value where possible."
-  (let ((value (symbol-value symbol)))
+  (let ((value (refine--symbol-value symbol)))
     (cond ((vectorp value)
            (refine--vector-pop symbol index))
           ((equal (length value) 1)
@@ -439,7 +444,7 @@ When called with a prefix, move that many positions."
   ;; Move the element.
   (let ((index (refine--index-at-point)))
     (if (numberp index)
-        (refine--move-element (symbol-value refine--symbol) index arg)
+        (refine--move-element (refine--symbol-value refine--symbol) index arg)
       (user-error "No list element here")))
   (refine-update)
   ;; Move point to match.
@@ -473,7 +478,7 @@ If DISTANCE is too big, move it as far as possible."
 (defun refine--move-point (distance)
   "Move point DISTANCE items forward.
 If DISTANCE is negative, move backwards."
-  (let* ((value (symbol-value refine--symbol)))
+  (let* ((value (refine--symbol-value refine--symbol)))
     ;; If we're dealing with a scalar or the empty list, just move to
     ;; the line where it's shown.
     (if (not (consp value))
@@ -512,13 +517,13 @@ If DISTANCE is negative, move backwards."
 (defun refine-edit (new-value)
   "Edit the current item in the list or vector."
   (interactive
-   (let* ((lst (symbol-value refine--symbol))
+   (let* ((lst (refine--symbol-value refine--symbol))
           (index (refine--index-at-point))
           (prompt (format "Set value at %s: " index))
           (current-value (elt lst index)))
      (list (refine--read-element refine--symbol prompt
                                  (refine--pretty-format current-value)))))
-  (setf (elt (symbol-value refine--symbol) (refine--index-at-point))
+  (setf (elt (refine--symbol-value refine--symbol) (refine--index-at-point))
         new-value)
   (refine-update))
 
@@ -615,15 +620,10 @@ where SYMBOL is set."
               (format "a %s containing %d %s"
                       type length units)))
            (:else "an unsupported type")))
-         (value-intro
-          (if is-local
-              (format "local value in buffer %s"
-                      (refine--buffer-button buffer))
-            "current value"))
          (value-description
           (if (boundp symbol)
-              (format " Its %s is %s:"
-                      value-intro type-description)
+              (format " Its value is %s:"
+                      type-description)
             "")))
     (s-word-wrap
      70
@@ -635,7 +635,7 @@ where SYMBOL is set."
   "Cycle the variable or list element through all possible values.
 For booleans, toggle nil/t."
   (interactive)
-  (let ((value (symbol-value refine--symbol))
+  (let ((value (refine--symbol-value refine--symbol))
         (index (refine--index-at-point))
         (possible-values (refine--possible-values refine--symbol)))
     (cond
