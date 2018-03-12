@@ -26,3 +26,10 @@ that only allows values from a set."
     (refine--possible-elements 'refine--possible-set)
     '(foo bar baz))))
 
+(defcustom refine--possible-unhandled '(1 2 3)
+  "Dummy to make Cask happy."
+  :type '(repeat number))
+
+(ert-deftest refine--possible-elements-unhandled ()
+  "Ensure that unhandled `defcustom' types do not error out."
+  (refine--possible-elements 'refine--possible-unhandled))
