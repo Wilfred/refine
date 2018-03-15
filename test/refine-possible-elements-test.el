@@ -26,3 +26,25 @@ that only allows values from a set."
     (refine--possible-elements 'refine--possible-set)
     '(foo bar baz))))
 
+(defcustom refine--possible-choice '(baz)
+  "Dummy to make Cask happy."
+  :type '(repeat (choice
+                  (const :tag "Foo" foo)
+                  (const :tag "Bar" bar)
+                  (const :tag "Baz" baz))))
+
+(ert-deftest refine--possible-elements-choice ()
+  "Ensure we offer the correct possibilities for a `defcustom'
+that allows a repeated choice."
+  (should
+   (equal
+    (refine--possible-elements 'refine--possible-choice)
+    '(foo bar baz))))
+
+(defcustom refine--possible-unhandled '(1 2 3)
+  "Dummy to make Cask happy."
+  :type '(repeat number))
+
+(ert-deftest refine--possible-elements-unhandled ()
+  "Ensure that unhandled `defcustom' types do not error out."
+  (refine--possible-elements 'refine--possible-unhandled))
