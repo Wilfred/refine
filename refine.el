@@ -78,6 +78,7 @@ Returns nil if SYMBOL is not a custom variable."
 (defun refine--pretty-format (value)
   "Pretty print VALUE as a string."
   (let ((cl-formatted (with-temp-buffer
+                        (emacs-lisp-mode)
                         (cl-prettyprint value)
                         (s-trim (buffer-string)))))
     (cond ((stringp value)
