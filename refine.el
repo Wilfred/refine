@@ -280,7 +280,7 @@ index."
   "Insert VALUE at INDEX in LIST.
 This mutates the list."
   ;; We can't handle empty lists: there's no cons cell to mutate.
-  (assert (consp list))
+  (cl-assert (consp list))
 
   (if (= index (length list))
       ;; We're appending to the list.
@@ -305,16 +305,16 @@ This mutates the list.
 
 If SYMBOL is nil, assigns to SYMBOL instead."
   (interactive)
-  (assert (symbolp symbol))
+  (cl-assert (symbolp symbol))
   (let* ((list (refine--symbol-value symbol))
          (length (safe-length list)))
-    (assert (or (consp list) (null list)))
+    (cl-assert (or (consp list) (null list)))
     (cond
      ;; If list is nil, we can't modify destructively.
      ((= length 0) (set symbol (list value)))
 
      (t
-      (assert (>= length index))
+      (cl-assert (>= length index))
       (refine--insert-list list index value)))))
 
 (defun refine--vector-pop (symbol index)
@@ -324,7 +324,7 @@ This creates a new vector and assigns it to SYMBOL. Vectors have
 fixed length, see *info* (elisp) Arrays."
   (let* ((vector (refine--symbol-value symbol))
          (length (length vector)))
-    (assert (and (vectorp vector) (< index length)))
+    (cl-assert (and (vectorp vector) (< index length)))
 
     (let* ((all-items (refine--vector->list vector))
            (items (--reject (= it-index index) all-items)))
@@ -335,7 +335,7 @@ fixed length, see *info* (elisp) Arrays."
   "Remove the item at INDEX from LIST.
 This mutates the list."
   (let* ((length (safe-length list)))
-    (assert (and (consp list) (> length 1) (< index length)))
+    (cl-assert (and (consp list) (> length 1) (< index length)))
 
     (if (equal index (1- length))
         ;; We're popping the very last cons cell.
@@ -548,7 +548,7 @@ If CURRENT is at the end, or not present, use the first item."
 
 (defun refine--buffer (symbol buffer)
   "Get or create a refine buffer for SYMBOL in BUFFER."
-  (assert (symbolp symbol))
+  (cl-assert (symbolp symbol))
   (let ((result-buffer (get-buffer-create (format "*refine: %s*" symbol))))
     (with-current-buffer result-buffer
       ;; Need to set the major mode before we set local variables.
