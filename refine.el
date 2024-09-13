@@ -677,7 +677,7 @@ For booleans, toggle nil/t."
 ;; TODO: add a magit-style popup.
 
 ;; Buffer-level operations.
-(define-key refine-mode-map (kbd "q") #'kill-this-buffer)
+(define-key refine-mode-map (kbd "q") (lambda () (interactive) (kill-this-buffer)))
 (define-key refine-mode-map (kbd "g") #'refine-update)
 
 ;; Modifying the list.
